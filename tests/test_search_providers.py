@@ -331,7 +331,7 @@ class TestSearchCache:
         # Temporarily replace default cache file with our test cache
         with patch.dict("os.environ", {"OLLAMA_API_KEY": ""}, clear=False):
             with patch(
-                "src.guest_search.smart_search_tool.SearchResultCache.__init__",
+                "src.utils.smart_search_tool.SearchResultCache.__init__",
                 return_value=None,
             ):
                 tool = SmartSearchTool(
