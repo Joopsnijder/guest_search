@@ -114,4 +114,16 @@ guest_search/
 
 ## License
 
-TBD
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgments
+
+Built with [Claude Code](https://claude.com/claude-code) by Anthropic.
+
+---
+
+**Repository**: https://github.com/Joopsnijder/guest_search
