@@ -121,7 +121,7 @@ class TestCacheExpiration:
     @freeze_time("2024-10-12 10:00:00")
     def test_cache_valid_within_24_hours(self, mock_data_dir, mock_search_results):
         """Test that cache is valid within 24 hours."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache = SearchResultCache(cache_file=str(mock_data_dir / "cache.json"))
 
@@ -138,7 +138,7 @@ class TestCacheExpiration:
     @freeze_time("2024-10-12 10:00:00")
     def test_cache_expired_after_24_hours(self, mock_data_dir, mock_search_results):
         """Test that cache expires after 24 hours."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache = SearchResultCache(cache_file=str(mock_data_dir / "cache.json"))
 
@@ -154,7 +154,7 @@ class TestCacheExpiration:
     @freeze_time("2024-10-12 10:00:00")
     def test_cache_exactly_at_expiration_boundary(self, mock_data_dir, mock_search_results):
         """Test cache at exactly 24-hour boundary."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache = SearchResultCache(cache_file=str(mock_data_dir / "cache.json"))
 

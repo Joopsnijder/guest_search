@@ -1,6 +1,6 @@
 """Tests for configuration and environment variables."""
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 
 class TestConfigurationLoading:
@@ -85,15 +85,17 @@ class TestMainFunctionConfiguration:
         importlib.reload(main)
 
         # Run main - should exit early without API key
-        with patch("builtins.print") as mock_print:
+        # It uses rich Console.print, not builtins.print
+        with patch("main.Console") as mock_console:
+            mock_console_instance = MagicMock()
+            mock_console.return_value = mock_console_instance
+
             main.main()
 
-            # Should print error message
-            mock_print.assert_called()
-            error_calls = [
-                call for call in mock_print.call_args_list if "ANTHROPIC_API_KEY" in str(call)
-            ]
-            assert len(error_calls) > 0
+            # Should print error message about API key
+            mock_console_instance.print.assert_called()
+            print_calls = [str(call) for call in mock_console_instance.print.call_args_list]
+            assert any("ANTHROPIC_API_KEY" in call for call in print_calls)
 
     @patch("src.guest_search.agent.GuestFinderAgent")
     @patch("os.makedirs")
@@ -113,6 +115,7 @@ class TestMainFunctionConfiguration:
         # Mock the agent to prevent actual execution
         mock_agent_instance = mock_agent.return_value
         mock_agent_instance.run_full_cycle.return_value = "Test report"
+        mock_agent_instance.candidates = []  # No candidates so no interactive prompts
 
         main.main()
 
@@ -139,6 +142,7 @@ class TestMainFunctionConfiguration:
         # Mock the agent
         with patch("main.GuestFinderAgent") as mock_agent:
             mock_agent.return_value.run_full_cycle.return_value = "Test"
+            mock_agent.return_value.candidates = []  # No candidates so no interactive prompts
             main.main()
 
         # Check file was created

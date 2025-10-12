@@ -178,3 +178,18 @@ class TrelloManager:
         cards = self._make_request("GET", f"/lists/{self.list_id}/cards")
 
         return any(card["name"] == guest_name for card in cards)
+
+    def get_card_by_name(self, guest_name: str) -> dict | None:
+        """Get a card by its name."""
+        if not self.list_id:
+            raise ValueError("Not connected to Trello. Call connect() first.")
+
+        # Get all cards in the list
+        cards = self._make_request("GET", f"/lists/{self.list_id}/cards")
+
+        return next((card for card in cards if card["name"] == guest_name), None)
+
+    def delete_card(self, card_id: str) -> bool:
+        """Delete a card by its ID."""
+        self._make_request("DELETE", f"/cards/{card_id}")
+        return True

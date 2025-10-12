@@ -84,13 +84,35 @@ class TestTrelloCardOperations:
         trello_manager.connect(board_name="AIToday Live", list_name="Spot")
         return trello_manager
 
+    @pytest.fixture
+    def cleanup_test_cards(self, connected_manager):
+        """Fixture to cleanup test cards after tests."""
+        test_card_names = [
+            "Test Guest (Pytest)",
+            "Complete Test Guest (Pytest)",
+        ]
+
+        # Cleanup before test (in case of previous test failures)
+        for card_name in test_card_names:
+            card = connected_manager.get_card_by_name(card_name)
+            if card:
+                connected_manager.delete_card(card["id"])
+
+        yield connected_manager
+
+        # Cleanup after test
+        for card_name in test_card_names:
+            card = connected_manager.get_card_by_name(card_name)
+            if card:
+                connected_manager.delete_card(card["id"])
+
     def test_card_exists_check(self, connected_manager):
         """Test checking if a card exists."""
         # This should work even if no cards exist
         exists = connected_manager.card_exists("NonExistentGuest123")
         assert isinstance(exists, bool)
 
-    def test_create_guest_card_minimal(self, connected_manager):
+    def test_create_guest_card_minimal(self, cleanup_test_cards):
         """Test creating a card with minimal guest data."""
         guest = {
             "name": "Test Guest (Pytest)",
@@ -99,17 +121,13 @@ class TestTrelloCardOperations:
         }
 
         # Create card
-        card_info = connected_manager.create_guest_card(guest)
+        card_info = cleanup_test_cards.create_guest_card(guest)
 
         assert "id" in card_info
         assert "url" in card_info
         assert card_info["name"] == "Test Guest (Pytest)"
 
-        # Cleanup: Delete the test card
-        # Note: We don't have a delete method, so this is a manual cleanup reminder
-        print(f"\n⚠️  Manual cleanup needed: Delete test card at {card_info['url']}")
-
-    def test_create_guest_card_full(self, connected_manager):
+    def test_create_guest_card_full(self, cleanup_test_cards):
         """Test creating a card with full guest data."""
         guest = {
             "name": "Complete Test Guest (Pytest)",
@@ -132,13 +150,11 @@ class TestTrelloCardOperations:
         }
 
         # Create card
-        card_info = connected_manager.create_guest_card(guest)
+        card_info = cleanup_test_cards.create_guest_card(guest)
 
         assert "id" in card_info
         assert "url" in card_info
         assert card_info["name"] == "Complete Test Guest (Pytest)"
-
-        print(f"\n⚠️  Manual cleanup needed: Delete test card at {card_info['url']}")
 
 
 # Mark all tests as integration tests

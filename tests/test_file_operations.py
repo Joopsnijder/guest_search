@@ -197,7 +197,7 @@ class TestCacheFileOperations:
 
     def test_cache_file_creation(self, mock_data_dir):
         """Test that cache files are created properly."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache_file = mock_data_dir / "cache" / "test_cache.json"
         cache = SearchResultCache(cache_file=str(cache_file))
@@ -215,7 +215,7 @@ class TestCacheFileOperations:
 
     def test_cache_file_corruption_handling(self, mock_data_dir):
         """Test handling of corrupted cache files."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache_file = mock_data_dir / "cache" / "corrupted.json"
         cache_file.write_text("{invalid json content")
@@ -226,7 +226,7 @@ class TestCacheFileOperations:
 
     def test_concurrent_cache_access(self, mock_data_dir):
         """Test that cache handles concurrent access safely."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache_file = mock_data_dir / "cache" / "concurrent.json"
 
@@ -244,7 +244,7 @@ class TestCacheFileOperations:
 
     def test_cache_directory_creation(self, temp_dir):
         """Test that cache directory is created if it doesn't exist."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache_file = temp_dir / "new_cache_dir" / "cache.json"
 
@@ -295,7 +295,7 @@ class TestFilePermissions:
 
     def test_invalid_file_path_handling(self):
         """Test handling of invalid file paths."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         # Path with invalid characters or non-existent parent
         invalid_path = "/nonexistent/directory/cache.json"
@@ -348,7 +348,7 @@ class TestDataIntegrity:
 
     def test_cache_data_integrity(self, mock_data_dir, mock_search_results):
         """Test cache data integrity across save/load cycles."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache_file = mock_data_dir / "cache" / "integrity_test.json"
 

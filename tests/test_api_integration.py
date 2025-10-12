@@ -167,6 +167,8 @@ class TestAnthropicAPIIntegration:
         self, mock_anthropic_class, mock_env_vars, sample_candidates, temp_dir
     ):
         """Test successful report generation."""
+        from freezegun import freeze_time
+
         from src.guest_search.agent import GuestFinderAgent
 
         # Setup mock
@@ -181,13 +183,9 @@ class TestAnthropicAPIIntegration:
             agent = GuestFinderAgent()
             agent.candidates = sample_candidates
 
-            # Mock file operations
+            # Mock file operations and freeze time
             with patch("builtins.open", create=True):
-                with patch("src.guest_search.agent.datetime") as mock_datetime:
-                    mock_datetime.now.return_value.isocalendar.return_value = (2024, 42, 1)
-                    mock_datetime.now.return_value.strftime.return_value = "20241012"
-                    mock_datetime.now.return_value.isoformat.return_value = "2024-10-12T10:00:00"
-
+                with freeze_time("2024-10-12 10:00:00"):
                     report = agent.generate_report()
 
         # Verify
@@ -197,6 +195,8 @@ class TestAnthropicAPIIntegration:
     @patch("src.guest_search.agent.Anthropic")
     def test_empty_candidates_report(self, mock_anthropic_class, mock_env_vars):
         """Test report generation with no candidates."""
+        from freezegun import freeze_time
+
         from src.guest_search.agent import GuestFinderAgent
 
         # Setup
@@ -207,7 +207,9 @@ class TestAnthropicAPIIntegration:
         with patch("src.guest_search.agent.SmartSearchTool"):
             agent = GuestFinderAgent()
             agent.candidates = []
-            report = agent.generate_report()
+            agent.previous_guests = []  # Ensure no previous guests either
+            with freeze_time("2024-10-12 10:00:00"):
+                report = agent.generate_report()
 
         # Verify - should not call API when no candidates
         assert "Geen nieuwe kandidaten" in report
