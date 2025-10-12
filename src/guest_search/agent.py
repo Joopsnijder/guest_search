@@ -6,6 +6,7 @@ from anthropic import Anthropic
 from anthropic.types import ToolParam
 from rich.console import Console
 from rich.live import Live
+from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
@@ -145,6 +146,14 @@ class GuestFinderAgent:
         elif tool_name == "save_candidate":
             self.candidates.append(tool_input)
             return {"status": "saved", "total_candidates": len(self.candidates)}
+
+        elif tool_name == "search_linkedin_profile":
+            name = tool_input["name"]
+            company = tool_input["company"]
+            # TODO: Implement real LinkedIn search logic here
+            # For now, return a mock LinkedIn profile URL based on name and company
+            linkedin_url = f"https://www.linkedin.com/search/results/people/?keywords={name.replace(' ', '%20')}%20{company.replace(' ', '%20')}"
+            return {"linkedin_url": linkedin_url, "status": "success"}
 
         return {"error": "Unknown tool"}
 
@@ -465,6 +474,14 @@ class GuestFinderAgent:
         with open("data/candidates_latest.json", "w", encoding="utf-8") as f:
             json.dump(self.candidates, f, indent=2, ensure_ascii=False)
 
+    def display_report(self, report: str):
+        """Toon het rapport mooi geformatteerd in de terminal."""
+        self.console.print()
+        self.console.print("=" * 80)
+        md = Markdown(report)
+        self.console.print(md)
+        self.console.print("=" * 80)
+
     def run_full_cycle(self):
         """Voer volledige cyclus uit"""
 
@@ -481,5 +498,6 @@ class GuestFinderAgent:
         # Fase 3: Rapporteren
         report = self.generate_report()
 
+        return report
         return report
         return report

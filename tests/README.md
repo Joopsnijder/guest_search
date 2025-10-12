@@ -10,7 +10,7 @@
 
 2. **Run Tests:**
    - Click ▶️ icons next to tests
-   - All 148 tests appear automatically
+   - All 181 tests appear automatically
 
 3. **Debug Tests:**
    - Click 🐛 icons next to tests
@@ -39,7 +39,7 @@ pytest tests/test_config.py::TestConfigurationLoading::test_config_constants
 
 ---
 
-## Test Files (148 tests)
+## Test Files (181 tests)
 
 | File | Tests | Focus Area |
 |------|-------|------------|
@@ -49,8 +49,10 @@ pytest tests/test_config.py::TestConfigurationLoading::test_config_constants
 | `test_json_parsing.py` | 17 | JSON parsing resilience |
 | `test_date_logic.py` | 24 | Date calculations & boundaries |
 | `test_config.py` | 22 | Configuration & env vars |
-| `test_conversation_flow.py` | 14 | Tool call handling |
+| `test_conversation_flow.py` | 14 | Tool call handling (guest agent) |
 | `test_web_scraping.py` | 20 | Web scraping resilience |
+| `test_topic_agent.py` | 15 | **NEW** - Topic finder agent |
+| `test_trello_integration.py` | 7 | Trello API integration |
 | `conftest.py` | - | Shared fixtures |
 
 ---

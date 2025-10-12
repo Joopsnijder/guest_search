@@ -31,9 +31,7 @@ def trello_credentials():
 @pytest.fixture
 def trello_manager(trello_credentials):
     """Fixture to create a TrelloManager instance."""
-    return TrelloManager(
-        api_key=trello_credentials["api_key"], token=trello_credentials["token"]
-    )
+    return TrelloManager(api_key=trello_credentials["api_key"], token=trello_credentials["token"])
 
 
 class TestTrelloConnection:
