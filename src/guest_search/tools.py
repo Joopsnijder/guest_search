@@ -30,6 +30,29 @@ def get_tools():
             },
         },
         {
+            "name": "fetch_page_content",
+            "description": """Haal de volledige inhoud van een webpagina op om personen,
+            functies en organisaties te vinden. Gebruik dit voor:
+            - Congresprogramma's om sprekers te vinden
+            - University pages om onderzoekers te identificeren
+            - Persberichten om namen en functies te vinden
+            - LinkedIn profielen om details op te halen
+
+            De tool geeft een samenvatting van de pagina met focus op personen,
+            hun functies, organisaties en contactinformatie.
+            """,
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "description": "De URL van de pagina om op te halen",
+                    }
+                },
+                "required": ["url"],
+            },
+        },
+        {
             "name": "check_previous_guests",
             "description": """Controleer of een persoon recent is aanbevolen (laatste 8 weken).
             Voorkom duplicaten door dit te gebruiken voordat je iemand toevoegt aan de

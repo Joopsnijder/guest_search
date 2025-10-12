@@ -48,75 +48,124 @@ Denk grondig na voordat je de strategie formuleert. Gebruik je thinking budget o
 beste aanpak te bepalen."""
 
 SEARCH_EXECUTION_PROMPT = """Je voert nu de zoekstrategie uit die je hebt bedacht.
-Huidige status
-Zoekopdrachten uitgevoerd: {searches_done}/{total_searches}
-Kandidaten gevonden: {candidates_found}/{target_candidates}
-Volgende zoekopdracht
-{current_query}
+
+## Huidige status
+- Zoekopdrachten uitgevoerd: {searches_done}/{total_searches}
+- Kandidaten gevonden: {candidates_found}/{target_candidates}
+
+## Volgende zoekopdracht
+Query: {current_query}
 Rationale: {query_rationale}
-Instructies
 
-Voer de web_search uit met de gegeven query
-Analyseer de resultaten:
+## Instructies
 
-Identificeer potentiële gastspreken
-Check of ze Nederlandse AI-experts zijn
-Zoek naar recente activiteiten (projecten, publicaties, aanstellingen)
+### Stap 1: Zoek met web_search
+Voer de `web_search` tool uit met de gegeven query.
 
+### Stap 2: Analyseer de zoekresultaten
+**LET OP**: Je krijgt alleen snippets, geen volledige pagina's. Zoek daarom naar:
+1. **Organisaties en congressen** die AI-experts vermelden (bijv. "AI Act Implementatie Congres", "TNO AI-onderzoek", "UvA AI Lab")
+2. **Persberichten en aankondigingen** met mogelijk namen van sprekers of onderzoekers
+3. **URLs die lijken te verwijzen naar personen** (bijv. LinkedIn profielen, university staff pages, speaker announcements)
 
-Voor veelbelovende kandidaten:
+### Stap 3: Verdiep je in veelbelovende URLs
+Voor veelbelovende URLs (bijv. congresprogramma's, sprekerlijsten, persberichten):
+1. Gebruik `fetch_page_content` om de volledige pagina op te halen
+2. Zoek naar namen, functies en organisaties op die pagina
+3. Identificeer concrete personen die als gast interessant zouden zijn
 
-Doe een verificatie-zoekopdracht (naam + organisatie)
-Gebruik check_previous_guests om duplicaten te voorkomen
-Bij 2+ goede bronnen: gebruik save_candidate
+### Stap 4: Sla kandidaten op
+Als je een interessante persoon vindt met voldoende informatie:
+1. Gebruik `check_previous_guests` met de naam om duplicaten te voorkomen
+2. Als deze persoon nog niet eerder is aanbevolen, gebruik dan `save_candidate` met:
+   - name: Volledige naam
+   - organization: Bedrijf/organisatie
+   - role: Functie/rol
+   - expertise: Expertisegebied (bijv. "AI Act implementatie", "Green AI", "MLOps")
+   - why_now: Waarom relevant (bijv. "Spreekt op AI Act Congres 2025", "Nieuw onderzoek gepubliceerd")
+   - sources: Lijst met URLs (minimaal 1, maximaal 3)
+   - contact_info: Email en/of LinkedIn als beschikbaar (leeg object als niet beschikbaar)
 
+**BELANGRIJK**:
+- Snippets bevatten zelden namen - je MOET daarom URLs fetchen met `fetch_page_content`
+- Focus op URLs van: congressen, sprekerlijsten, university pages, persberichten, LinkedIn
+- Je MOET kandidaten actief opslaan met `save_candidate` zodra je ze vindt
 
+### Stap 5: Beslislogica
+- Als je {target_candidates} kandidaten hebt gevonden: je bent klaar
+- Anders: ga systematisch door met de volgende zoekopdracht
 
-Beslislogica na deze zoekopdracht
-Als je voldoende kandidaten hebt ({target_candidates}): stop zoeken
-Als resultaten weinig opleveren: overweeg query aanpassen
-Anders: ga door naar volgende zoekopdracht
-Werk systematisch en grondig. Gebruik de tools actief."""
+## Voorbeeld workflow
+1. web_search("AI Act implementatie Nederland bedrijven praktijk 2025")
+2. Zie resultaat: "AI Act Implementatie Congres: Van onduidelijkheid naar daadkracht" - https://aic4nl.nl/evenement/ai-act-implementatie-congres/
+3. fetch_page_content("https://aic4nl.nl/evenement/ai-act-implementatie-congres/")
+4. Vind op pagina: "Spreker: Dr. Sarah Veldman, Senior AI Policy Advisor bij TNO"
+5. check_previous_guests("Sarah Veldman")
+6. save_candidate met alle details
+
+Werk systematisch en fetch URLs om echte personen te vinden!"""
 
 REPORT_GENERATION_PROMPT = """Maak een rapport van de gevonden kandidaten voor AIToday Live.
-Gevonden kandidaten
+
+## Nieuwe kandidaten deze week
 {candidates_json}
-Rapport specificaties
-Structuur:
 
-Titel: "Potentiële gasten voor AIToday Live - Week {week_number}"
-Intro: 2-3 zinnen over deze week (welke thema's, sectorverdeling)
-Per kandidaat een sectie
+## Recent aanbevolen kandidaten (laatste 2 weken)
+{recent_guests_json}
 
-Per kandidaat:
+Indicatoren:
+- has_new_candidates: {has_new_candidates}
+- has_recent_guests: {has_recent_guests}
 
-Naam en functie: [Naam] - [Rol] bij [Organisatie]
-Mogelijke onderwerpen:
+## Rapport specificaties
 
-Bullet point 1
-Bullet point 2
+### Structuur:
 
+**Titel:** "Potentiële gasten voor AIToday Live - Week {week_number}"
 
-Waarom interessant: 3-5 zinnen waarin je feitelijk beschrijft:
+**Intro:** 2-3 zinnen over deze week (welke thema's, sectorverdeling)
 
-Wat deze persoon doet/heeft gedaan
-Waarom relevant voor AIToday Live
-Recente ontwikkelingen of projecten
-Geen hype, wel informatief
+**Secties:**
+1. Als has_new_candidates == True: Sectie "Nieuwe kandidaten" met alle nieuwe kandidaten
+2. Als has_recent_guests == True: Sectie "Recent aanbevolen (herhaling)" met alle recente gasten
 
+### Per kandidaat (nieuwe kandidaten):
 
-Bronnen: Maximaal 3 links met korte beschrijving
-Contact: E-mail en/of LinkedIn (alleen als beschikbaar)
+**Naam en functie:** [Naam] - [Rol] bij [Organisatie]
 
-Toon:
+**Mogelijke onderwerpen:**
+- Bullet point 1
+- Bullet point 2
 
-Positief maar feitelijk
-Toegankelijk (casual professioneel)
-Vermijd buzzwoorden
-Korte alinea's (3-5 zinnen)
+**Waarom interessant:** 3-5 zinnen waarin je feitelijk beschrijft:
+- Wat deze persoon doet/heeft gedaan
+- Waarom relevant voor AIToday Live
+- Recente ontwikkelingen of projecten
+- Geen hype, wel informatief
 
-Verboden woorden/zinnen
+**Bronnen:** Maximaal 3 links met korte beschrijving
+
+**Contact:** E-mail en/of LinkedIn (alleen als beschikbaar)
+
+### Per kandidaat (recent aanbevolen):
+
+**Naam en functie:** [Naam] - [Rol] bij [Organisatie]
+
+**Waarom toen aanbevolen:** Gebruik het "why_now" veld uit de data
+
+**Bronnen:** Links uit het "sources" veld
+
+**Aanbevolen op:** [Datum in leesbaar formaat]
+
+### Toon:
+- Positief maar feitelijk
+- Toegankelijk (casual professioneel)
+- Vermijd buzzwoorden
+- Korte alinea's (3-5 zinnen)
+
+### Verboden woorden/zinnen
 Gebruik NIET: rijk, reis, meevoeren, inspireren, interactief, magie, sprankelen, avontuur,
 iconisch, mysterieus, symfonie, essentieel, cruciaal, betoverend, navigeren, robuust,
 geheimen, dynamisch, krachtig, scala, "in een wereld van", "met een twist", "hand in hand"
+
 Genereer nu het volledige rapport in markdown formaat."""

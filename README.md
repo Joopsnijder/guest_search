@@ -12,15 +12,92 @@ AI-driven podcast guest finder with intelligent search and automatic rate limit 
 🔄 **Multi-Provider Fallback** - Serper → SearXNG → Brave → Google Scraper
 ⚡ **Smart Rate Limiting** - Automatic provider skipping on 402/429 errors
 💾 **Intelligent Caching** - 1-day result cache to minimize API calls
+🎯 **Interactive Selection** - Beautiful terminal UI to review and select guests
+📋 **Trello Integration** - One-click export of guests to Trello boards
 ✅ **Well Tested** - 159 tests covering 9 critical risk areas
 📊 **Arc42 Documentation** - Complete architecture documentation with Mermaid diagrams
 
-## Installation
+## Quick Start
+
+### 1. Installation
 
 ```bash
-# Install in development mode
-pip install -e ".[dev]"
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
+
+### 2. Configure API Keys
+
+Copy `.env.example` to `.env` and add your API keys:
+
+```bash
+cp .env.example .env
+# Edit .env with your keys
+```
+
+Required:
+- `ANTHROPIC_API_KEY` - Get from https://console.anthropic.com/
+
+Recommended (at least one search provider):
+- `SERPER_API_KEY` - Get from https://serper.dev (2,500 free searches/month)
+- `BRAVE_API_KEY` - Get from https://brave.com/search/api/
+
+Optional (for Trello integration):
+- `TRELLO_API_KEY` and `TRELLO_TOKEN` - See [TRELLO_SETUP.md](TRELLO_SETUP.md)
+
+### 3. Run the Guest Finder
+
+```bash
+# Run the complete workflow (recommended)
+python main.py
+```
+
+This will:
+1. **Search Phase**: AI agent finds potential guests using web search
+2. **Analysis Phase**: Fetches full page content to identify specific people
+3. **Report Generation**: Creates a markdown report in `output/reports/`
+4. **Interactive Selection**: Automatically prompts to review and select guests
+
+After the search completes, you'll be asked if you want to review candidates immediately or later.
+
+**Alternative workflows:**
+
+```bash
+# View the UI without running the agent (uses existing data)
+python demo_ui.py
+
+# Run only the interactive selector (skip the agent search)
+python select_guests.py
+```
+
+### 4. Interactive Guest Selection
+
+The interactive selector provides a beautiful terminal UI where you can:
+
+✨ **Features:**
+- 🎨 Browse all new and recent guests with full details
+- 🔗 View all source URLs for easy reference and verification
+- 📧 See contact information when available (email, LinkedIn)
+- 📋 Export selected guests to Trello with one click
+- ✓ Automatic duplicate detection before creating cards
+- 📊 See guests from the last 2 weeks (yellow-highlighted)
+
+**Available actions:**
+- Type a number (e.g., `1`) to select that guest for Trello export
+- Type `all` to export all new guests at once
+- Type `quit` or `q` to exit
+
+**Each guest card shows:**
+- Name, role, and organization
+- Topics of expertise
+- Why they're relevant right now
+- All source URLs (clickable in most terminals)
+- Contact info if available
+- Date recommended (for recent guests)
 
 ## Development
 
@@ -46,8 +123,11 @@ pip install -e ".[dev]"
 
 #### In Terminal
 ```bash
-# Run all tests
-pytest
+# Run all unit tests (skip integration tests)
+pytest -m "not integration" -v
+
+# Run all tests including integration (requires Trello credentials)
+pytest -v
 
 # Run specific test file
 pytest tests/test_config.py -v
@@ -57,6 +137,9 @@ pytest --cov=guest_search --cov-report=html
 
 # Quick health check (fast tests only)
 pytest tests/test_config.py tests/test_date_logic.py -v
+
+# Run only integration tests (Trello)
+pytest -m integration -v
 ```
 
 #### Test Documentation
@@ -64,6 +147,7 @@ pytest tests/test_config.py tests/test_date_logic.py -v
 - 📊 [Test Coverage Summary](docs/TEST_COVERAGE_SUMMARY.md) - Detailed risk analysis
 - ⚡ [Quick Reference](docs/QUICK_TEST_REFERENCE.md) - Common commands
 - 📝 [Test Suite README](tests/README.md) - Writing new tests
+- 🔗 [Integration Tests](tests/INTEGRATION_TESTS.md) - Trello integration testing
 
 ### Code Quality
 

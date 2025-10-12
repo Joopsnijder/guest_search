@@ -21,17 +21,20 @@ from typing import Any
 
 import httpx
 import requests
-from dotenv import load_dotenv
 
 # Voor web scraping fallback
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
+# Setup logging - only show warnings and errors by default
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
+
+# Suppress verbose logging from httpx
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 # Custom exception for rate limiting
