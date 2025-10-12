@@ -13,9 +13,9 @@ from rich.panel import Panel
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
-from .config import Config
-from .prompts import TOPIC_REPORT_GENERATION_PROMPT, TOPIC_SEARCH_PROMPT
-from .smart_search_tool import SmartSearchTool
+from src.guest_search.config import Config
+from src.topic_search.prompts import TOPIC_REPORT_GENERATION_PROMPT, TOPIC_SEARCH_PROMPT
+from src.utils.smart_search_tool import SmartSearchTool
 
 
 class TopicFinderAgent:

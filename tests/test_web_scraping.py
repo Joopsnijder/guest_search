@@ -8,7 +8,7 @@ class TestGoogleScraper:
 
     def test_scraper_initialization(self):
         """Test Google scraper initialization."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         provider = GoogleScraperProvider()
 
@@ -17,7 +17,7 @@ class TestGoogleScraper:
 
     def test_scraper_parses_basic_html(self):
         """Test parsing basic HTML structure."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         html = """
         <html>
@@ -45,7 +45,7 @@ class TestGoogleScraper:
 
     def test_scraper_handles_alternative_selectors(self):
         """Test scraper with alternative HTML selectors."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         html = """
         <html>
@@ -71,7 +71,7 @@ class TestGoogleScraper:
 
     def test_scraper_handles_google_redirect_urls(self):
         """Test handling of Google redirect URLs."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         html = """
         <html>
@@ -98,7 +98,7 @@ class TestGoogleScraper:
 
     def test_scraper_handles_empty_results(self):
         """Test scraper with no search results."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         html = """
         <html>
@@ -121,7 +121,7 @@ class TestGoogleScraper:
 
     def test_scraper_handles_network_errors(self):
         """Test scraper handling of network errors."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         with patch("httpx.Client") as mock_client:
             mock_client.return_value.__enter__.return_value.get.side_effect = Exception(
@@ -136,7 +136,7 @@ class TestGoogleScraper:
 
     def test_scraper_handles_timeout(self):
         """Test scraper handling of timeout."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         with patch("httpx.Client") as mock_client:
             import httpx
@@ -152,7 +152,7 @@ class TestGoogleScraper:
 
     def test_scraper_limits_results(self):
         """Test that scraper limits number of results."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         # Create HTML with many results
         html = "<html>"
@@ -180,7 +180,7 @@ class TestGoogleScraper:
 
     def test_scraper_handles_missing_elements(self):
         """Test scraper with incomplete HTML elements."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         html = """
         <html>
@@ -211,7 +211,7 @@ class TestGoogleScraper:
 
     def test_scraper_http_403_handling(self):
         """Test handling of HTTP 403 (blocked)."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         with patch("httpx.Client") as mock_client:
             mock_response = Mock()
@@ -226,7 +226,7 @@ class TestGoogleScraper:
 
     def test_scraper_http_503_handling(self):
         """Test handling of HTTP 503 (service unavailable)."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         with patch("httpx.Client") as mock_client:
             mock_response = Mock()
@@ -309,7 +309,7 @@ class TestUserAgentHandling:
 
     def test_user_agent_is_set(self):
         """Test that User-Agent header is set."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         provider = GoogleScraperProvider()
 
@@ -318,7 +318,7 @@ class TestUserAgentHandling:
 
     def test_user_agent_looks_realistic(self):
         """Test that User-Agent looks like a real browser."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         provider = GoogleScraperProvider()
         user_agent = provider.headers["User-Agent"]
@@ -328,7 +328,7 @@ class TestUserAgentHandling:
 
     def test_headers_contain_standard_fields(self):
         """Test that headers contain standard HTTP fields."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         provider = GoogleScraperProvider()
 

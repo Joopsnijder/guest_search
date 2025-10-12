@@ -188,7 +188,7 @@ class TestEnvironmentVariableHandling:
         monkeypatch.setenv("SERPER_API_KEY", "test-serper")
         monkeypatch.setenv("BRAVE_API_KEY", "test-brave")
 
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         tool = SmartSearchTool(
             serper_api_key="test-serper", brave_api_key="test-brave", enable_cache=False

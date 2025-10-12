@@ -422,7 +422,7 @@ When selecting a guest in the interactive UI:
 2. Verify API quota not exceeded
 3. Check provider status:
    ```bash
-   python -c "from src.guest_search.smart_search_tool import SmartSearchTool; t = SmartSearchTool(); print(t.search('test'))"
+   python -c "from src.utils.smart_search_tool import SmartSearchTool; t = SmartSearchTool(); print(t.search('test'))"
    ```
 4. Check logs for rate limit errors
 

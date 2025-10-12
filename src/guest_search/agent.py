@@ -13,8 +13,8 @@ from rich.table import Table
 
 from .config import Config
 from .prompts import PLANNING_PROMPT, REPORT_GENERATION_PROMPT, SEARCH_EXECUTION_PROMPT
-from .smart_search_tool import SmartSearchTool
 from .tools import get_tools
+from src.utils.smart_search_tool import SmartSearchTool
 
 
 class GuestFinderAgent:

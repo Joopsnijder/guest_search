@@ -4,7 +4,7 @@ Tests for rate limit handling in SmartSearchTool
 
 import pytest
 from unittest.mock import MagicMock, patch
-from src.guest_search.smart_search_tool import (
+from src.utils.smart_search_tool import (
     SmartSearchTool,
     RateLimitError,
     OllamaProvider,

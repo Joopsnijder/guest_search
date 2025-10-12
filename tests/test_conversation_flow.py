@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 class TestConversationBuilding:
     """Test building multi-turn conversations with the AI."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_conversation_initialization(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test initializing a conversation."""
@@ -21,7 +21,7 @@ class TestConversationBuilding:
         # Initial conversation should be empty
         assert agent.candidates == []
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_single_tool_call_conversation(
         self, mock_anthropic, mock_search_tool, mock_env_vars, mock_search_results
@@ -57,7 +57,7 @@ class TestConversationBuilding:
         assert "results" in result
         assert len(result["results"]) > 0
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_multiple_tool_calls_in_sequence(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test handling multiple tool calls in sequence."""
@@ -92,7 +92,7 @@ class TestConversationBuilding:
 class TestToolCallHandling:
     """Test handling of various tool calls."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_web_search_tool_call(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test web_search tool call handling."""
@@ -120,7 +120,7 @@ class TestToolCallHandling:
         assert len(result["results"]) > 0
         assert result["provider"] == "TestProvider"
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_check_previous_guests_tool_call(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test check_previous_guests tool call handling."""
@@ -144,7 +144,7 @@ class TestToolCallHandling:
         assert result["already_recommended"] is True
         assert "weeks_ago" in result
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_save_candidate_tool_call(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test save_candidate tool call handling."""
@@ -167,7 +167,7 @@ class TestToolCallHandling:
         assert result["total_candidates"] == 1
         assert len(agent.candidates) == 1
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_unknown_tool_call(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test handling of unknown tool call."""
@@ -184,7 +184,7 @@ class TestToolCallHandling:
 class TestToolResultFormatting:
     """Test formatting of tool results for the AI."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_search_results_formatting(
         self, mock_anthropic, mock_search_tool, mock_env_vars, mock_search_results
@@ -208,7 +208,7 @@ class TestToolResultFormatting:
             assert "snippet" in item
             assert "url" in item
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_empty_search_results_formatting(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test formatting of empty search results."""
@@ -230,7 +230,7 @@ class TestToolResultFormatting:
 class TestConversationStateManagement:
     """Test managing conversation state across multiple turns."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_candidate_accumulation(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test that candidates accumulate across multiple tool calls."""
@@ -254,7 +254,7 @@ class TestConversationStateManagement:
 
         assert len(agent.candidates) == 3
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_previous_guests_persistence(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test that previous guests list persists across checks."""
@@ -317,7 +317,7 @@ class TestMessageConstruction:
 class TestSearchPhaseConversation:
     """Test conversation flow during search phase."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_search_phase_with_valid_strategy(
         self, mock_anthropic, mock_search_tool, mock_env_vars, mock_search_results
@@ -349,7 +349,7 @@ class TestSearchPhaseConversation:
         # Should have called API
         assert mock_client.messages.create.called
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_search_phase_with_no_strategy(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test search phase with missing strategy."""
@@ -366,7 +366,7 @@ class TestSearchPhaseConversation:
         # Should not call API
         assert not mock_client.messages.create.called
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_search_phase_stops_at_target(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test that search phase stops when target candidates reached."""

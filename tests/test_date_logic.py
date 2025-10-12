@@ -10,7 +10,7 @@ from freezegun import freeze_time
 class TestGuestExclusionLogic:
     """Test logic for excluding recently recommended guests."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     @freeze_time("2024-10-12 10:00:00")
     def test_guest_within_exclusion_window(
@@ -29,7 +29,7 @@ class TestGuestExclusionLogic:
         assert result["already_recommended"] is True
         assert result["weeks_ago"] >= 0
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     @freeze_time("2024-10-12 10:00:00")
     def test_guest_outside_exclusion_window(
@@ -47,7 +47,7 @@ class TestGuestExclusionLogic:
 
         assert result["already_recommended"] is False
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     @freeze_time("2024-10-12 10:00:00")
     def test_guest_exactly_at_boundary(
@@ -75,7 +75,7 @@ class TestGuestExclusionLogic:
         # Should be included (8 weeks is still within exclusion)
         assert result["already_recommended"] is True
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_guest_never_recommended(
         self, mock_anthropic, mock_search_tool, empty_previous_guests_file, monkeypatch
@@ -91,7 +91,7 @@ class TestGuestExclusionLogic:
 
         assert result["already_recommended"] is False
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     @freeze_time("2024-10-12 10:00:00")
     def test_case_insensitive_name_matching(

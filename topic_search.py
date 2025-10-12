@@ -12,7 +12,7 @@ from rich.prompt import Confirm
 from rich.table import Table
 
 from src.guest_search.config import Config
-from src.guest_search.topic_agent import TopicFinderAgent
+from src.topic_search.agent import TopicFinderAgent
 
 
 def check_existing_report():

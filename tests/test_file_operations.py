@@ -9,7 +9,7 @@ import pytest
 class TestPreviousGuestsFileOperations:
     """Test operations on previous_guests.json file."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_load_existing_previous_guests(
         self, mock_anthropic, mock_search_tool, previous_guests_file, monkeypatch
@@ -26,7 +26,7 @@ class TestPreviousGuestsFileOperations:
         assert agent.previous_guests[0]["name"] == "Jan Jansen"
         assert agent.previous_guests[1]["name"] == "Marie van der Berg"
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_load_missing_previous_guests_file(
         self, mock_anthropic, mock_search_tool, temp_dir, monkeypatch
@@ -41,7 +41,7 @@ class TestPreviousGuestsFileOperations:
         # Should return empty list when file doesn't exist
         assert agent.previous_guests == []
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_load_malformed_json_file(
         self, mock_anthropic, mock_search_tool, malformed_json_file, monkeypatch
@@ -59,7 +59,7 @@ class TestPreviousGuestsFileOperations:
         with pytest.raises(json.JSONDecodeError):
             GuestFinderAgent()
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_save_previous_guests(
         self, mock_anthropic, mock_search_tool, empty_previous_guests_file, monkeypatch
@@ -87,7 +87,7 @@ class TestPreviousGuestsFileOperations:
         assert len(saved_data) == 1
         assert saved_data[0]["name"] == "New Guest"
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_save_with_special_characters(
         self, mock_anthropic, mock_search_tool, empty_previous_guests_file, monkeypatch
@@ -119,7 +119,7 @@ class TestPreviousGuestsFileOperations:
 class TestReportFileOperations:
     """Test report file generation and saving."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_report_file_creation(
         self,
@@ -152,7 +152,7 @@ class TestReportFileOperations:
         # Verify report was generated
         assert "Test Report" in report
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_report_filename_format(
         self, mock_anthropic, mock_search_tool, temp_dir, sample_candidates, monkeypatch
@@ -260,7 +260,7 @@ class TestCacheFileOperations:
 class TestFilePermissions:
     """Test file permission handling."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_read_only_file_handling(
         self, mock_anthropic, mock_search_tool, previous_guests_file, monkeypatch
@@ -308,7 +308,7 @@ class TestFilePermissions:
 class TestDataIntegrity:
     """Test data integrity across save/load cycles."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_roundtrip_data_integrity(
         self, mock_anthropic, mock_search_tool, empty_previous_guests_file, monkeypatch

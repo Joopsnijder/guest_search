@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 class TestStrategyJSONParsing:
     """Test parsing of strategy JSON from AI responses."""
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_valid_strategy_json(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test parsing of valid strategy JSON."""
@@ -33,7 +33,7 @@ class TestStrategyJSONParsing:
         assert strategy["week_focus"] == "AI Ethics"
         assert len(strategy["search_queries"]) == 1
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_json_with_surrounding_text(
         self, mock_anthropic, mock_search_tool, mock_env_vars
@@ -61,7 +61,7 @@ class TestStrategyJSONParsing:
         assert strategy_result is not None
         assert strategy_result["week_focus"] == "Green AI"
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_malformed_json(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test handling of malformed JSON."""
@@ -82,7 +82,7 @@ class TestStrategyJSONParsing:
         # Should return None on parse failure
         assert strategy is None
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_incomplete_json(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test handling of incomplete JSON."""
@@ -101,7 +101,7 @@ class TestStrategyJSONParsing:
         # Should return None on parse failure
         assert strategy is None
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_json_with_unicode(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test parsing JSON with Unicode characters."""
@@ -128,7 +128,7 @@ class TestStrategyJSONParsing:
         assert strategy_result is not None
         assert "Françoise" in strategy_result["week_focus"]
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_nested_json_structures(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test parsing deeply nested JSON structures."""
@@ -159,7 +159,7 @@ class TestStrategyJSONParsing:
         assert strategy_result is not None
         assert len(strategy_result["search_queries"]) == 1
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_json_with_escaped_characters(
         self, mock_anthropic, mock_search_tool, mock_env_vars
@@ -186,7 +186,7 @@ class TestStrategyJSONParsing:
         assert strategy_result is not None
         assert '"Machine Learning"' in strategy_result["week_focus"]
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_parse_empty_json_object(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test parsing empty JSON object."""
@@ -205,7 +205,7 @@ class TestStrategyJSONParsing:
         # Empty JSON is valid but might fail validation
         assert strategy == {}
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_no_json_in_response(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test handling of response with no JSON."""
@@ -226,7 +226,7 @@ class TestStrategyJSONParsing:
         # Should return None when no JSON found
         assert strategy is None
 
-    @patch("src.guest_search.agent.SmartSearchTool")
+    @patch("src.utils.smart_search_tool.SmartSearchTool")
     @patch("src.guest_search.agent.Anthropic")
     def test_multiple_json_objects_in_response(
         self, mock_anthropic, mock_search_tool, mock_env_vars

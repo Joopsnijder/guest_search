@@ -133,7 +133,7 @@ print(f"Target candidates: {Config.TARGET_CANDIDATES}")
 ### Stap 4: Manual Test Search
 
 ```python
-from src.guest_search.smart_search_tool import SmartSearchTool
+from src.utils.smart_search_tool import SmartSearchTool
 
 tool = SmartSearchTool(enable_cache=False)
 result = tool.search("AI expert Netherlands 2025")

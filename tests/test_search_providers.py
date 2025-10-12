@@ -11,7 +11,7 @@ class TestSearchProviderFallback:
 
     def test_smart_search_tool_initialization(self, mock_env_vars):
         """Test SmartSearchTool initialization with API keys."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         tool = SmartSearchTool(
             serper_api_key="test-serper",
@@ -24,7 +24,7 @@ class TestSearchProviderFallback:
 
     def test_search_with_serper_success(self, mock_env_vars, mock_serper_response):
         """Test successful search with Serper provider."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         with patch("requests.post") as mock_post:
             mock_post.return_value.status_code = 200
@@ -39,7 +39,7 @@ class TestSearchProviderFallback:
 
     def test_search_with_searxng_success(self, mock_searxng_response):
         """Test successful search with SearXNG provider."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         with patch("requests.get") as mock_get:
             mock_get.return_value.status_code = 200
@@ -53,7 +53,7 @@ class TestSearchProviderFallback:
 
     def test_search_with_brave_success(self, mock_brave_response):
         """Test successful search with Brave provider."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         with patch("requests.get") as mock_get:
             mock_get.return_value.status_code = 200
@@ -72,7 +72,7 @@ class TestSearchProviderFallback:
 
     def test_automatic_fallback_on_provider_failure(self, mock_env_vars):
         """Test automatic fallback when primary provider fails."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         call_count = {"post": 0, "get": 0}
 
@@ -110,7 +110,7 @@ class TestSearchProviderFallback:
 
     def test_all_providers_fail_returns_empty(self):
         """Test that empty results are returned when all providers fail."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         with patch("requests.post") as mock_post:
             with patch("requests.get") as mock_get:
@@ -128,7 +128,7 @@ class TestSearchProviderFallback:
 
     def test_searxng_instance_rotation(self):
         """Test SearXNG instance rotation on failure."""
-        from src.guest_search.smart_search_tool import SearXNGProvider
+        from src.utils.smart_search_tool import SearXNGProvider
 
         provider = SearXNGProvider()
         initial_instance = provider.instance_url
@@ -142,7 +142,7 @@ class TestSearchProviderFallback:
 
     def test_empty_search_results_handling(self):
         """Test handling when primary provider returns empty, falls back to others."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         with patch("requests.post") as mock_post:
             mock_post.return_value.status_code = 200
@@ -163,7 +163,7 @@ class TestSearchProviders:
 
     def test_serper_provider_is_available(self):
         """Test SerperProvider availability check."""
-        from src.guest_search.smart_search_tool import SerperProvider
+        from src.utils.smart_search_tool import SerperProvider
 
         provider_with_key = SerperProvider("test-key")
         assert provider_with_key.is_available()
@@ -173,7 +173,7 @@ class TestSearchProviders:
 
     def test_serper_provider_search_success(self, mock_serper_response):
         """Test SerperProvider search method."""
-        from src.guest_search.smart_search_tool import SerperProvider
+        from src.utils.smart_search_tool import SerperProvider
 
         with patch("requests.post") as mock_post:
             mock_post.return_value.status_code = 200
@@ -190,7 +190,7 @@ class TestSearchProviders:
 
     def test_serper_provider_rate_limit_handling(self):
         """Test SerperProvider raises RateLimitError on rate limits."""
-        from src.guest_search.smart_search_tool import SerperProvider, RateLimitError
+        from src.utils.smart_search_tool import SerperProvider, RateLimitError
 
         with patch("requests.post") as mock_post:
             mock_post.return_value.status_code = 429  # Rate limited
@@ -204,7 +204,7 @@ class TestSearchProviders:
 
     def test_brave_provider_is_available(self):
         """Test BraveProvider availability check."""
-        from src.guest_search.smart_search_tool import BraveProvider
+        from src.utils.smart_search_tool import BraveProvider
 
         provider_with_key = BraveProvider("test-key")
         assert provider_with_key.is_available()
@@ -214,21 +214,21 @@ class TestSearchProviders:
 
     def test_searxng_provider_always_available(self):
         """Test that SearXNG is always available (free, no key needed)."""
-        from src.guest_search.smart_search_tool import SearXNGProvider
+        from src.utils.smart_search_tool import SearXNGProvider
 
         provider = SearXNGProvider()
         assert provider.is_available()
 
     def test_google_scraper_always_available(self):
         """Test that Google scraper is always available as last resort."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         provider = GoogleScraperProvider()
         assert provider.is_available()
 
     def test_google_scraper_parses_html(self):
         """Test Google scraper HTML parsing."""
-        from src.guest_search.smart_search_tool import GoogleScraperProvider
+        from src.utils.smart_search_tool import GoogleScraperProvider
 
         html_content = """
         <html>
@@ -258,14 +258,14 @@ class TestSearchCache:
 
     def test_cache_initialization(self, mock_data_dir):
         """Test cache initialization."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache = SearchResultCache(cache_file=str(mock_data_dir / "search_cache.json"))
         assert cache.cache_data == {}
 
     def test_cache_stores_and_retrieves_results(self, mock_data_dir, mock_search_results):
         """Test caching and retrieval of search results."""
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache_file = mock_data_dir / "search_cache.json"
         cache = SearchResultCache(cache_file=str(cache_file))
@@ -286,7 +286,7 @@ class TestSearchCache:
         """Test that expired cache entries are not returned."""
         from datetime import datetime, timedelta
 
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache_file = mock_data_dir / "search_cache.json"
         cache = SearchResultCache(cache_file=str(cache_file))
@@ -310,7 +310,7 @@ class TestSearchCache:
 
     def test_cache_hit_in_smart_search(self, mock_data_dir, mock_search_results):
         """Test that SmartSearchTool respects cache."""
-        from src.guest_search.smart_search_tool import SearchResultCache, SmartSearchTool
+        from src.utils.smart_search_tool import SearchResultCache, SmartSearchTool
 
         cache_file = str(mock_data_dir / "search_cache.json")
 
@@ -350,7 +350,7 @@ class TestSearchCache:
 
     def test_disable_cache(self):
         """Test disabling cache functionality."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         tool = SmartSearchTool(enable_cache=True)
         assert tool.cache is not None
@@ -360,7 +360,7 @@ class TestSearchCache:
 
     def test_enable_cache(self):
         """Test enabling cache functionality."""
-        from src.guest_search.smart_search_tool import SmartSearchTool
+        from src.utils.smart_search_tool import SmartSearchTool
 
         tool = SmartSearchTool(enable_cache=False)
         assert tool.cache is None
@@ -372,7 +372,7 @@ class TestSearchCache:
         """Test clearing expired cache entries."""
         from datetime import datetime, timedelta
 
-        from src.guest_search.smart_search_tool import SearchResultCache
+        from src.utils.smart_search_tool import SearchResultCache
 
         cache = SearchResultCache(cache_file=str(mock_data_dir / "cache.json"))
 
