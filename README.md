@@ -1,20 +1,22 @@
 # Guest Search
 
-[![Tests](https://img.shields.io/badge/tests-159%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-181%20passing-brightgreen)](tests/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-AI-driven podcast guest finder with intelligent search and automatic rate limit handling.
+AI-driven podcast guest finder and topic researcher with intelligent search and automatic rate limit handling.
 
 ## Features
 
 🤖 **AI-Powered Search** - Claude Sonnet 4 agent with extended thinking for strategic guest finding
+🔍 **Topic Research** - Separate tool to find interesting AI topics for your podcast
 🔄 **Multi-Provider Fallback** - Serper → SearXNG → Brave → Google Scraper
 ⚡ **Smart Rate Limiting** - Automatic provider skipping on 402/429 errors
 💾 **Intelligent Caching** - 1-day result cache to minimize API calls
 🎯 **Interactive Selection** - Beautiful terminal UI to review and select guests
 📋 **Trello Integration** - One-click export of guests to Trello boards
-✅ **Well Tested** - 159 tests covering 9 critical risk areas
+📝 **Rich Markdown Reports** - Beautiful terminal-rendered reports with syntax highlighting
+✅ **Well Tested** - 181 tests covering 10 critical areas (guest finder + topic researcher)
 📊 **Arc42 Documentation** - Complete architecture documentation with Mermaid diagrams
 
 ## Quick Start
@@ -49,7 +51,9 @@ Recommended (at least one search provider):
 Optional (for Trello integration):
 - `TRELLO_API_KEY` and `TRELLO_TOKEN` - See [TRELLO_SETUP.md](TRELLO_SETUP.md)
 
-### 3. Run the Guest Finder
+### 3. Run the Tools
+
+#### Guest Finder
 
 ```bash
 # Run the complete workflow (recommended)
@@ -57,12 +61,12 @@ python main.py
 ```
 
 This will:
-1. **Search Phase**: AI agent finds potential guests using web search
-2. **Analysis Phase**: Fetches full page content to identify specific people
-3. **Report Generation**: Creates a markdown report in `output/reports/`
-4. **Interactive Selection**: Automatically prompts to review and select guests
-
-After the search completes, you'll be asked if you want to review candidates immediately or later.
+1. **Planning Phase**: AI analyzes current trends and creates search strategy
+2. **Search Phase**: AI agent finds potential guests using web search
+3. **Analysis Phase**: Fetches full page content to identify specific people
+4. **Report Generation**: Creates a markdown report in `output/reports/`
+5. **Report Preview** (optional): View formatted report in terminal with Rich markdown
+6. **Interactive Selection**: Prompts to review and select guests for Trello
 
 **Alternative workflows:**
 
@@ -73,6 +77,26 @@ python demo_ui.py
 # Run only the interactive selector (skip the agent search)
 python select_guests.py
 ```
+
+#### Topic Researcher
+
+```bash
+# Find interesting AI topics for your podcast
+python topic_search.py
+```
+
+This will:
+1. **Check for existing reports**: If a report exists for today, shows it (no duplicate searches)
+2. **Topic Search Phase**: AI finds 6-8 interesting AI topics from the last 14 days
+3. **Report Generation**: Creates markdown + JSON in `output/topic_reports/`
+4. **Report Preview**: Beautiful Rich markdown rendering in terminal with emojis per category
+
+**Features:**
+- 📅 Automatic duplicate detection (won't search twice on same day)
+- 🎯 Targeted for "Anne de Vries" persona (IT product owner, early adopter)
+- 🏷️ 6 categories: Wetenschappelijk, Praktijkvoorbeeld, Informatief, Transformatie, Waarschuwend, Kans
+- 📊 Each topic includes: ideal guest profile, search keywords, discussion angles
+- 💾 Saves both markdown report and JSON data for easy processing
 
 ### 4. Interactive Guest Selection
 
@@ -99,6 +123,33 @@ The interactive selector provides a beautiful terminal UI where you can:
 - Contact info if available
 - Date recommended (for recent guests)
 
+### 5. Markdown Report Viewing
+
+Both tools generate beautiful markdown reports that can be viewed directly in the terminal:
+
+**Features:**
+- 📝 Rich markdown rendering with proper formatting
+- 🎨 Syntax highlighting for code blocks
+- 📋 Beautiful headers with borders
+- 📊 Clean bullet lists and numbered lists
+- 🔗 Visible URLs for easy reference
+- ➖ Horizontal rules as section dividers
+
+**Example output:**
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    Potentiële gasten voor AIToday Live - Week 41   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+Dr. Sarah Veldman - Senior AI Policy Advisor bij TNO
+
+Mogelijke onderwerpen:
+ • AI Act implementatie in Nederlandse bedrijven
+ • Praktische uitdagingen bij compliance
+```
+
+The markdown rendering uses the [Rich](https://github.com/Textualize/rich) library for beautiful terminal output.
+
 ## Development
 
 ### Setup
@@ -114,7 +165,7 @@ pip install -e ".[dev]"
 
 ### Testing
 
-**📊 Test Suite: 159 tests covering 9 critical risk areas**
+**📊 Test Suite: 181 tests covering 10 critical areas**
 
 #### In VSCode (Recommended)
 1. Open Test Explorer (🧪 icon in sidebar)
@@ -181,19 +232,37 @@ See [RATE_LIMIT_HANDLING.md](docs/RATE_LIMIT_HANDLING.md) for details.
 
 ```
 guest_search/
+├── main.py                        # Guest finder entry point
+├── topic_search.py                # Topic researcher entry point
+├── select_guests.py               # Interactive guest selector
+├── demo_ui.py                     # UI demo (no Trello)
 ├── src/
-│   └── guest_search/      # Main package
-│       └── __init__.py
-├── tests/                 # Test files
+│   └── guest_search/              # Main package
+│       ├── agent.py               # Guest finder agent
+│       ├── topic_agent.py         # Topic finder agent
+│       ├── prompts.py             # All AI prompts
+│       ├── smart_search_tool.py   # Multi-provider search
+│       ├── trello_manager.py      # Trello integration
+│       ├── interactive_selector.py # Terminal UI
+│       └── tools.py               # Tool definitions
+├── tests/                         # Test files (159 tests)
 │   ├── __init__.py
-│   └── conftest.py
-├── docs/                  # Documentation
-│   ├── architecture.md    # Arc42 architecture docs
-│   └── RATE_LIMIT_HANDLING.md  # Rate limit feature docs
-├── scripts/               # Utility scripts
-├── pyproject.toml        # Project configuration
-├── README.md             # This file
-└── .gitignore            # Git ignore rules
+│   ├── conftest.py
+│   └── test_*.py
+├── docs/                          # Documentation
+│   ├── architecture.md            # Arc42 architecture
+│   ├── RATE_LIMIT_HANDLING.md     # Rate limit docs
+│   ├── VSCODE_TEST_GUIDE.md       # Testing guide
+│   └── *.md                       # More documentation
+├── output/
+│   ├── reports/                   # Guest reports
+│   └── topic_reports/             # Topic reports (MD + JSON)
+├── data/
+│   ├── previous_guests.json       # Deduplication database
+│   └── candidates_latest.json     # Latest search results
+├── pyproject.toml                 # Project configuration
+├── requirements.txt               # Dependencies
+└── README.md                      # This file
 ```
 
 ## License
