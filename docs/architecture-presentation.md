@@ -23,20 +23,22 @@ style: |
 
 # Guest Search - Architectuur
 
-**AI-driven podcast guest finder**
+**AI-driven podcast guest finder & topic researcher**
 
-arc42 documentatie
+arc42 documentatie - Updated 2025
 
 ---
 
 ## 1. Introductie
 
 ### Doel
-Geautomatiseerde wekelijkse zoektocht naar Nederlandse AI-experts voor AIToday Live podcast
+Geautomatiseerde content discovery voor AIToday Live podcast:
+- Nederlandse AI-experts identificeren
+- Interessante AI-topics ontdekken
 
 ### Stakeholders
-- 🎙️ Podcast producers → Actuele gastenlijst
-- ✍️ Redactie → Geverifieerde kandidaten
+- 🎙️ Podcast producers → Actuele gastenlijst + topiclijst
+- ✍️ Redactie → Geverifieerde kandidaten en bronnen
 - 👥 Eindgebruikers → Betrouwbare voorstellen
 
 ---
@@ -44,18 +46,31 @@ Geautomatiseerde wekelijkse zoektocht naar Nederlandse AI-experts voor AIToday L
 ## 2. Context
 
 ```mermaid
-graph LR
-    U[Gebruiker] -->|Start| GF[Guest Finder<br/>Agent]
+graph TB
+    U[Gebruiker] -->|main.py| GF[Guest Finder<br/>Agent]
+    U -->|topic_search.py| TF[Topic Finder<br/>Agent]
+
     GF -->|API calls| CA[Claude API]
+    TF -->|API calls| CA
+
     GF -->|Queries| SP[Search<br/>Providers]
+    TF -->|Queries| SP
+
     SP -->|Resultaten| GF
-    GF -->|R/W| FS[(File<br/>Storage)]
-    GF -->|Rapport| U
+    SP -->|Resultaten| TF
+
+    GF -->|Export| TR[Trello Board]
+    GF -->|Rapporten| FS1[(File Storage<br/>output/reports)]
+    TF -->|Rapporten| FS2[(File Storage<br/>output/topic_reports)]
 
     SP --> S1[Serper]
     SP --> S2[SearXNG]
     SP --> S3[Brave]
     SP --> S4[Google]
+
+    style GF fill:#e3f2fd
+    style TF fill:#f3e5f5
+    style TR fill:#c8e6c9
 ```
 
 ---
@@ -64,10 +79,12 @@ graph LR
 
 ### Kernprincipes
 1. 🎯 **Multi-phase**: Planning → Zoeken → Rapporteren
-2. 🧠 **AI-driven**: Claude met extended thinking
-3. 🔄 **Resilient search**: Multi-provider fallback
-4. 💾 **Caching**: 1-dag cache voor rate limits
-5. ✅ **Verificatie**: Min. 2 bronnen per kandidaat
+2. 🧠 **AI-driven**: Claude Sonnet 4 met extended thinking
+3. 🔄 **Resilient search**: Multi-provider fallback (4 providers)
+4. 💾 **Smart caching**: 1-dag cache + duplicate detection
+5. ✅ **Verificatie**: Min. 2 bronnen per item
+6. 📊 **Two agents**: Separate guest & topic discovery
+7. 📝 **Rich UI**: Beautiful markdown rendering in terminal
 
 ---
 
@@ -75,24 +92,31 @@ graph LR
 
 ```mermaid
 graph TD
-    subgraph "Agent"
-        M[main.py] --> GFA[GuestFinderAgent]
-        GFA --> P1[Planning]
-        GFA --> P2[Search]
-        GFA --> P3[Report]
+    subgraph "Entry Points"
+        M1[main.py] --> GFA[GuestFinderAgent]
+        M2[topic_search.py] --> TFA[TopicFinderAgent]
+        M3[select_guests.py] --> IS[InteractiveSelector]
     end
 
-    subgraph "Components"
+    subgraph "Shared Components"
         GFA --> SST[SmartSearchTool]
+        TFA --> SST
         SST --> Cache
         SST --> Providers
+        IS --> TM[TrelloManager]
     end
 
     subgraph "Storage"
-        GFA --> PG[(previous<br/>guests)]
+        GFA --> PG[(previous<br/>guests.json)]
         Cache --> SC[(search<br/>cache)]
-        P3 --> RP[(reports)]
+        GFA --> GR[(output/reports)]
+        TFA --> TR[(output/topic_reports)]
+        IS --> CL[(candidates_latest.json)]
     end
+
+    style GFA fill:#e3f2fd
+    style TFA fill:#f3e5f5
+    style TM fill:#c8e6c9
 ```
 
 ---
@@ -212,11 +236,12 @@ graph TB
 
 | Kwaliteit | Target | Status |
 |-----------|--------|--------|
-| **Test Coverage** | >80% | ✅ 148 tests |
+| **Test Coverage** | >80% | ✅ 181 tests |
 | **Availability** | >95% | ✅ Multi-provider |
 | **Response Time** | <2 min | ✅ Met cache |
 | **Accuracy** | 2+ bronnen | ✅ Verplicht |
-| **Freshness** | <14 dagen | ✅ Recent focus |
+| **Freshness Topics** | <1 maand | ✅ Recent focus |
+| **Freshness Guests** | <12 weeks | ✅ Deduplication |
 
 ---
 
@@ -224,10 +249,13 @@ graph TB
 
 | Component | Verantwoordelijkheid |
 |-----------|---------------------|
-| **GuestFinderAgent** | Orkestratie 3 fases |
-| **SmartSearchTool** | Multi-provider search |
+| **GuestFinderAgent** | Orkestratie gasten zoeken (3 fases) |
+| **TopicFinderAgent** | Orkestratie topics zoeken |
+| **SmartSearchTool** | Multi-provider search (gedeeld) |
+| **InteractiveSelector** | Rich UI voor gast selectie |
+| **TrelloManager** | Trello API integratie |
 | **SearchResultCache** | 1-dag caching |
-| **SearchProviders** | API abstractie |
+| **SearchProviders** | API abstractie (4 providers) |
 | **Tools** | Agent capabilities |
 | **Prompts** | Fase-specifieke prompts |
 
@@ -244,6 +272,8 @@ graph TB
 - 🔄 Async support voor parallelle queries
 - 📊 Database voor team usage
 - 🔔 Monitoring/alerting
+- 🔗 LinkedIn profile search integration
+- 📧 Automated outreach templates
 
 ---
 

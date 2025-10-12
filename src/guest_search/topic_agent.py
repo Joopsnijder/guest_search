@@ -101,10 +101,6 @@ class TopicFinderAgent:
                             "type": "string",
                             "description": "Korte beschrijving van het topic (2-3 zinnen)",
                         },
-                        "ideal_guest_profile": {
-                            "type": "string",
-                            "description": "Profiel van ideale gast om dit topic te bespreken",
-                        },
                         "search_keywords": {
                             "type": "array",
                             "items": {"type": "string"},
@@ -133,7 +129,6 @@ class TopicFinderAgent:
                         "category",
                         "why_relevant_for_anne",
                         "description",
-                        "ideal_guest_profile",
                         "search_keywords",
                         "discussion_angles",
                         "sources",

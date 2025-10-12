@@ -181,7 +181,7 @@ Anne is een nieuwsgierige early-adopter die net aan haar AI-reis begint:
 
 ## Jouw taak
 
-Zoek 6-8 interessante AI-topics die in de afgelopen 14 dagen actueel zijn geworden voor Anne.
+Zoek 6-8 interessante AI-topics die in de afgelopen maand actueel zijn geworden voor Anne.
 
 ### Categorieën (spreiding gewenst):
 1. **Wetenschappelijk**: Doorbraak of onderzoek met praktische implicaties
@@ -196,7 +196,6 @@ Zoek 6-8 interessante AI-topics die in de afgelopen 14 dagen actueel zijn geword
 - **Categorie**: Een van bovenstaande categorieën
 - **Waarom relevant voor Anne**: 2-3 zinnen die direct inspelen op haar profiel
 - **Beschrijving**: Korte beschrijving van het topic (2-3 zinnen)
-- **Ideaal gast-profiel**: Wie zou je uitnodigen om dit te bespreken?
 - **Zoektermen voor gasten**: 3-5 keywords om gasten te vinden
 - **Discussiehoeken**: 3-4 vragen/invalshoeken voor in de podcast
 - **Bronnen**: Minimaal 2 recente bronnen (Nederlandse bronnen bij voorkeur)
@@ -205,7 +204,7 @@ Zoek 6-8 interessante AI-topics die in de afgelopen 14 dagen actueel zijn geword
 
 Gebruik `web_search` en `fetch_page_content` om te zoeken naar:
 1. Recente Nederlandse AI-nieuws (AG Connect, Computable, NOS Tech)
-2. Internationale AI-ontwikkelingen (laatste 14 dagen)
+2. Internationale AI-ontwikkelingen (laatste maand)
 3. Reddit discussies over AI (r/ChatGPT, r/LocalLLaMA, r/MachineLearning)
 4. Persberichten van Nederlandse bedrijven/universiteiten
 5. LinkedIn trending posts over AI (Nederlandse professionals)
@@ -214,7 +213,7 @@ Gebruik `web_search` en `fetch_page_content` om te zoeken naar:
 ### Kwaliteitscriteria
 
 Een topic is geschikt als:
-- ✅ Het is actueel (laatste 14 dagen) OF binnenkort relevant
+- ✅ Het is actueel (laatste maand) OF binnenkort relevant
 - ✅ Anne kan het direct toepassen of heeft er waarde van
 - ✅ Er is een interessante gast voor te vinden
 - ✅ Het past bij Anne's kennislevel (niet te basic, niet te diep technisch)
@@ -249,9 +248,6 @@ Voor elk topic een sectie met:
 
 **Beschrijving:**
 [2-3 zinnen over het topic zelf]
-
-**Ideale gast:**
-[Profiel van wie je zou uitnodigen om dit te bespreken]
 
 **Zoektermen voor gasten:**
 - [keyword 1]

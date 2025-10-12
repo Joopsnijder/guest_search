@@ -1,9 +1,6 @@
 """Tests for TopicFinderAgent - topic research functionality."""
 
-import json
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 
 class TestTopicAgentInitialization:
@@ -64,7 +61,8 @@ class TestTopicToolDefinitions:
         assert "title" in required_fields
         assert "category" in required_fields
         assert "why_relevant_for_anne" in required_fields
-        assert "ideal_guest_profile" in required_fields
+        assert "description" in required_fields
+        assert "search_keywords" in required_fields
 
         # Check category enum
         category_enum = save_topic_tool["input_schema"]["properties"]["category"]["enum"]
@@ -137,7 +135,6 @@ class TestTopicToolHandling:
             "category": "Wetenschappelijk",
             "why_relevant_for_anne": "Practical application",
             "description": "AI improves diagnostics",
-            "ideal_guest_profile": "Dr. AI Researcher",
             "search_keywords": ["AI", "healthcare", "diagnostics"],
             "discussion_angles": ["How does it work?", "What are the risks?"],
             "sources": [{"url": "https://example.com", "title": "AI News", "date": "2025-01-01"}],
@@ -160,11 +157,10 @@ class TestTopicToolHandling:
 
         for i in range(3):
             topic_data = {
-                "title": f"Topic {i+1}",
+                "title": f"Topic {i + 1}",
                 "category": "Informatief",
                 "why_relevant_for_anne": "Relevant",
                 "description": "Description",
-                "ideal_guest_profile": "Expert",
                 "search_keywords": ["keyword"],
                 "discussion_angles": ["question"],
                 "sources": [{"url": "url", "title": "title", "date": "date"}],
@@ -180,9 +176,7 @@ class TestTopicReportGeneration:
 
     @patch("src.guest_search.topic_agent.SmartSearchTool")
     @patch("src.guest_search.topic_agent.Anthropic")
-    def test_generate_report_with_no_topics(
-        self, mock_anthropic, mock_search_tool, mock_env_vars
-    ):
+    def test_generate_report_with_no_topics(self, mock_anthropic, mock_search_tool, mock_env_vars):
         """Test generating report when no topics found."""
         from src.guest_search.topic_agent import TopicFinderAgent
 
@@ -221,7 +215,6 @@ class TestTopicReportGeneration:
                 "category": "Wetenschappelijk",
                 "why_relevant_for_anne": "Practical",
                 "description": "Description",
-                "ideal_guest_profile": "Expert",
                 "search_keywords": ["AI"],
                 "discussion_angles": ["Question"],
                 "sources": [{"url": "url", "title": "title", "date": "date"}],
@@ -296,9 +289,7 @@ class TestErrorHandling:
         mock_get.side_effect = Exception("Network error")
 
         agent = TopicFinderAgent()
-        result = agent._handle_tool_call(
-            "fetch_page_content", {"url": "https://example.com/fail"}
-        )
+        result = agent._handle_tool_call("fetch_page_content", {"url": "https://example.com/fail"})
 
         assert result["status"] == "error"
         assert "error" in result
@@ -363,7 +354,6 @@ class TestCategoryValidation:
                 "category": category,
                 "why_relevant_for_anne": "Relevant",
                 "description": "Description",
-                "ideal_guest_profile": "Expert",
                 "search_keywords": ["keyword"],
                 "discussion_angles": ["question"],
                 "sources": [{"url": "url", "title": "title", "date": "date"}],

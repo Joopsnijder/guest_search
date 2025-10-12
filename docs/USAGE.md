@@ -104,7 +104,7 @@ python topic_search.py
 
 3. **Topic Search Phase** (if no report or creating new)
    - AI searches for 6-8 interesting AI topics
-   - Looks for content from last 14 days
+   - Looks for content from last month
    - Targets "Anne de Vries" persona (IT product owner, early adopter)
    - Uses web_search and fetch_page_content tools
    - Shows live progress with topic count
@@ -112,7 +112,6 @@ python topic_search.py
 4. **Report Generation**
    - Creates markdown report with emoji categories
    - Saves both MD and JSON files
-   - Format includes ideal guest profile per topic
    - Provides search keywords and discussion angles
 
 5. **Report Preview**
@@ -152,8 +151,7 @@ Each topic includes:
 - **Category** - One of the 6 categories above
 - **Why relevant for Anne** - 2-3 sentences explaining value
 - **Description** - Short description (2-3 sentences)
-- **Ideal guest profile** - Who to invite to discuss this
-- **Search keywords** - 3-5 keywords to find guests
+- **Search keywords** - 3-5 keywords to find guests (use with guest_search tool)
 - **Discussion angles** - 3-4 questions/perspectives for podcast
 - **Sources** - Minimum 2 recent sources (preferably Dutch)
 
