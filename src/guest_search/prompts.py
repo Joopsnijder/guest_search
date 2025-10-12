@@ -9,10 +9,8 @@ Dag van de week: {day_of_week}
 Analyseer de situatie en maak een zoekstrategie voor deze week. Denk na over:
 
 1. **Actuele AI-thema's**: Welke AI-onderwerpen zijn deze week actueel in Nederland?
-2. **Sectorbalans**: Welke sectoren zijn onderbelicht? (zorg, energie, overheid, \
-agrifood, finance, industrie, retail, onderwijs)
-3. **Diverse onderwerpen**: Zoek spreiding over Explainable AI, Green AI, \
-MLOps/LLMOps, AI-ethiek, AI-Act, praktijkcases
+2. **Sectorbalans**: Welke sectoren zijn onderbelicht? (zorg, energie, overheid, agrifood, finance, industrie, retail, onderwijs)
+3. **Diverse onderwerpen**: Zoek spreiding over Explainable AI, Green AI, MLOps/LLMOps, AI-ethiek, AI-Act, praktijkcases
 4. **Bronnen-strategie**: Welke Nederlandse bronnen zijn relevant?
    - Vakmedia: AG Connect, Computable, Emerce, Automatiseringsgids
    - Universiteiten: TU Delft, UvA, RUG, UT, UU (persberichten)

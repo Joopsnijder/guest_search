@@ -2,7 +2,6 @@ import os
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm
 
 from src.guest_search.agent import GuestFinderAgent
 from src.guest_search.config import Config
@@ -48,32 +47,35 @@ def main():
         console.print("=" * 60)
         console.print(f"Nieuwe kandidaten gevonden: [bold]{len(agent.candidates)}[/bold]\n")
 
-        # Ask if user wants to review and select guests
-        console.print(
-            Panel.fit(
-                "[bold]Wil je de kandidaten nu bekijken en selecteren voor Trello?[/bold]\n"
-                "Je kunt ook later 'python select_guests.py' uitvoeren.",
-                border_style="cyan",
-            )
-        )
+        selector = InteractiveGuestSelector()
+        selector.run()
 
-        if Confirm.ask("Kandidaten bekijken en naar Trello sturen?", default=True):
-            console.print()
-            # Launch interactive selector
-            selector = InteractiveGuestSelector()
-            selector.run()
-        else:
-            console.print(
-                "\n[cyan]Je kunt later 'python select_guests.py' "
-                "uitvoeren om kandidaten te selecteren.[/cyan]"
-            )
+    #     # Ask if user wants to review and select guests
+    #     console.print(
+    #         Panel.fit(
+    #             "[bold]Wil je de kandidaten nu bekijken en selecteren voor Trello?[/bold]\n"
+    #             "Je kunt ook later 'python select_guests.py' uitvoeren.",
+    #             border_style="cyan",
+    #         )
+    #     )
 
-    elif report:
-        console.print("\n[yellow]Geen nieuwe kandidaten gevonden deze week.[/yellow]")
-        console.print(
-            "[dim]Je kunt 'python select_guests.py' uitvoeren "
-            "om recente kandidaten te bekijken.[/dim]"
-        )
+    #     if Confirm.ask("Kandidaten bekijken en naar Trello sturen?", default=True):
+    #         console.print()
+    #         # Launch interactive selector
+    #         selector = InteractiveGuestSelector()
+    #         selector.run()
+    #     else:
+    #         console.print(
+    #             "\n[cyan]Je kunt later 'python select_guests.py' "
+    #             "uitvoeren om kandidaten te selecteren.[/cyan]"
+    #         )
+
+    # elif report:
+    #     console.print("\n[yellow]Geen nieuwe kandidaten gevonden deze week.[/yellow]")
+    #     console.print(
+    #         "[dim]Je kunt 'python select_guests.py' uitvoeren "
+    #         "om recente kandidaten te bekijken.[/dim]"
+    #     )
 
 
 if __name__ == "__main__":

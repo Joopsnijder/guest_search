@@ -5,7 +5,7 @@ from datetime import datetime
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Prompt
 
 from .trello_manager import TrelloManager
 
@@ -87,6 +87,11 @@ class InteractiveGuestSelector:
         # Create content
         content_parts = []
 
+        # Function and company
+        highlightcolor = "cyan" if not is_recent else "yellow"
+        content_parts.append(f"[{highlightcolor}][bold]{subtitle}[/bold][/{highlightcolor}]")
+        content_parts.append("")
+
         # Topics or expertise
         topics = guest.get("topics", [])
         if topics:
@@ -148,14 +153,13 @@ class InteractiveGuestSelector:
         content = "\n".join(content_parts)
 
         # Create panel
-        title_text = f"[{index}] {name}"
+        title_text = f"[{index}] {name} - {subtitle}" if subtitle else f"[{index}] {name}"
         if is_recent:
             title_text = f"[{index}] {name} [yellow](recent)[/yellow]"
 
         panel = Panel(
             content,
             title=title_text,
-            subtitle=subtitle,
             border_style="cyan" if not is_recent else "yellow",
             padding=(1, 2),
         )
