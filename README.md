@@ -1,6 +1,19 @@
 # Guest Search
 
-A tool for finding and managing podcast guests.
+[![Tests](https://img.shields.io/badge/tests-159%20passing-brightgreen)](tests/)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+AI-driven podcast guest finder with intelligent search and automatic rate limit handling.
+
+## Features
+
+🤖 **AI-Powered Search** - Claude Sonnet 4 agent with extended thinking for strategic guest finding
+🔄 **Multi-Provider Fallback** - Serper → SearXNG → Brave → Google Scraper
+⚡ **Smart Rate Limiting** - Automatic provider skipping on 402/429 errors
+💾 **Intelligent Caching** - 1-day result cache to minimize API calls
+✅ **Well Tested** - 159 tests covering 9 critical risk areas
+📊 **Arc42 Documentation** - Complete architecture documentation with Mermaid diagrams
 
 ## Installation
 
