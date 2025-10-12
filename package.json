@@ -1,0 +1,21 @@
+{
+  "name": "guest_search",
+  "version": "1.0.0",
+  "description": "A tool for finding and managing podcast guests.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:presentations": "./scripts/build-presentations.sh",
+    "build:all": "npm run build:presentations"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@marp-team/marp-core": "^4.1.0"
+  }
+}

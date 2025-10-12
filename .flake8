@@ -1,0 +1,4 @@
+[flake8]
+# Disable Flake8 - Using Ruff instead
+ignore = *
+exclude = *
