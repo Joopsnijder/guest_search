@@ -140,20 +140,165 @@ python topic_search.py
 
 ## How It Works
 
-Our integration uses an **Anthropic-compatible adapter** that:
+### Architecture Overview
 
-1. Wraps Portkey's SDK to maintain Anthropic's API interface
-2. Automatically converts between Anthropic and OpenAI formats
-3. Routes all API calls through Portkey's gateway
-4. Preserves tool calling functionality
-5. Falls back to direct Anthropic SDK if Portkey is not configured
+Our integration uses an **Anthropic-compatible adapter** that sits between your agent code and Portkey's gateway:
+
+```
+┌─────────────────────┐
+│   Agent Code        │ ← Uses Anthropic SDK format
+│   (Unchanged)       │   client.messages.create(...)
+└──────────┬──────────┘
+           │
+           ↓
+┌─────────────────────┐
+│  Adapter Layer      │ ← Converts formats automatically
+│  (portkey_client.py)│
+└──────────┬──────────┘
+           │
+           ↓
+┌─────────────────────┐
+│  Portkey SDK        │ ← Uses OpenAI format
+│  (Model Catalog)    │   chat.completions.create(...)
+└──────────┬──────────┘
+           │
+           ↓
+┌─────────────────────┐
+│  Anthropic API      │ ← Portkey routes to Claude
+└─────────────────────┘
+```
+
+### Why Format Conversion is Needed
+
+Portkey's **Model Catalog** uses OpenAI's API format as the standard interface for all LLM providers. This means:
+
+- **Our agents** use Anthropic's `messages.create()` format
+- **Portkey expects** OpenAI's `chat.completions.create()` format
+- **The adapter** translates between these formats automatically
+
+**Without the adapter**, we would need to:
+1. ❌ Rewrite all agent code to use OpenAI format
+2. ❌ Lose backwards compatibility
+3. ❌ Couple our code tightly to Portkey
+
+**With the adapter:**
+1. ✅ Zero changes to existing agent code
+2. ✅ Backwards compatible (works with/without Portkey)
+3. ✅ Optional - toggle with environment variables
+4. ✅ Full tool calling support maintained
+5. ✅ Automatic request/response format conversion
+
+### Format Conversions
+
+The adapter handles several key conversions:
+
+#### 1. Message Content Blocks
+
+**Anthropic Format** (what agents use):
+```python
+{
+    "role": "assistant",
+    "content": [
+        {"type": "text", "text": "Let me search..."},
+        {"type": "tool_use", "id": "123", "name": "search", "input": {...}}
+    ]
+}
+```
+
+**OpenAI Format** (what Portkey expects):
+```python
+{
+    "role": "assistant",
+    "content": "Let me search...",
+    "tool_calls": [{
+        "id": "123",
+        "function": {"name": "search", "arguments": "{}"}
+    }]
+}
+```
+
+#### 2. Tool Definitions
+
+**Anthropic Format**:
+```python
+{
+    "name": "web_search",
+    "description": "Search the web",
+    "input_schema": {  # ← Anthropic uses "input_schema"
+        "type": "object",
+        "properties": {...}
+    }
+}
+```
+
+**OpenAI Format**:
+```python
+{
+    "type": "function",
+    "function": {
+        "name": "web_search",
+        "description": "Search the web",
+        "parameters": {  # ← OpenAI uses "parameters"
+            "type": "object",
+            "properties": {...}
+        }
+    }
+}
+```
+
+#### 3. Tool Results
+
+**Anthropic Format**:
+```python
+{
+    "role": "user",
+    "content": [
+        {
+            "type": "tool_result",
+            "tool_use_id": "123",
+            "content": "Search results..."
+        }
+    ]
+}
+```
+
+**OpenAI Format**:
+```python
+{
+    "role": "tool",  # ← Different role
+    "tool_call_id": "123",
+    "content": "Search results..."
+}
+```
+
+#### 4. Empty Content Filtering
+
+Anthropic allows messages with complex content blocks that may be empty, but OpenAI requires all messages (except the final assistant message) to have non-empty content. The adapter filters these automatically.
+
+### Implementation Details
+
+The adapter (`src/utils/portkey_client.py`) provides:
+
+1. **`get_anthropic_client()`** - Factory function that returns either:
+   - Standard Anthropic client (if Portkey not configured)
+   - Adapter-wrapped Portkey client (if Portkey configured)
+
+2. **`AnthropicPortkeyAdapter`** - Wrapper class that:
+   - Exposes `client.messages` interface (Anthropic-compatible)
+   - Internally uses Portkey SDK with OpenAI format
+   - Converts all requests and responses transparently
+
+3. **`MessagesAdapter`** - Handles the `messages.create()` method:
+   - Converts Anthropic messages to OpenAI format
+   - Converts Anthropic tools to OpenAI functions
+   - Calls Portkey with correct format
+   - Converts OpenAI responses back to Anthropic format
 
 **Benefits:**
-- ✅ Zero changes to existing agent code
-- ✅ Backwards compatible
-- ✅ Optional - toggle with environment variables
-- ✅ Full tool calling support
-- ✅ Automatic request/response format conversion
+- ✅ Agents don't know Portkey exists
+- ✅ Works exactly like standard Anthropic SDK
+- ✅ Can be disabled by removing environment variables
+- ✅ Maintains full API compatibility
 
 ## Advanced Usage
 
@@ -230,6 +375,53 @@ pip install --upgrade portkey-ai
 1. Verify your Anthropic API key in the Portkey Model Catalog
 2. Check that your Portkey API key is valid and not expired
 3. Ensure the provider slug starts with `@` (e.g., `@aitoday-anthropic`)
+
+### "All messages must have non-empty content" Error
+
+**Problem:** Error message like:
+```
+anthropic error: messages.3: all messages must have non-empty content
+except for the optional final assistant message
+```
+
+**Cause:** This happens when the adapter encounters messages with complex content blocks that result in empty content after conversion.
+
+**Solution:**
+This was fixed in the latest version of the adapter. If you still see this error:
+
+1. Ensure you have the latest version of `src/utils/portkey_client.py`
+2. The adapter now automatically:
+   - Filters empty content blocks
+   - Extracts text from complex Anthropic content structures
+   - Handles tool results correctly
+   - Skips messages that would be empty
+
+If the error persists, check your message history for unusual content structures and report the issue.
+
+### Tool Calling Not Working
+
+**Problem:** Tools are not being called correctly, or tool responses are malformed
+
+**Solution:**
+1. Verify tools are defined in Anthropic format (with `input_schema`)
+2. The adapter automatically converts to OpenAI format (with `parameters`)
+3. Check that tool results are being passed back correctly
+4. Review Portkey logs to see the actual tool calls being made
+
+### Format Conversion Errors
+
+**Problem:** Unexpected errors during message conversion
+
+**Common Issues:**
+- **Complex content blocks** - The adapter extracts text from nested structures
+- **Empty messages** - Automatically filtered (except final assistant message)
+- **Tool results** - Converted from Anthropic's `tool_result` to OpenAI's tool role
+
+**Debug Steps:**
+1. Enable verbose logging to see message conversions
+2. Check that messages follow Anthropic's format specifications
+3. Review the adapter code in `src/utils/portkey_client.py`
+4. Test with simple messages first, then add complexity
 
 ## Cost Estimates
 

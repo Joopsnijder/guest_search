@@ -103,10 +103,38 @@ class MessagesAdapter:
         # Convert messages
         if messages:
             for msg in messages:
-                openai_messages.append({
-                    "role": msg["role"],
-                    "content": msg["content"]
-                })
+                # Extract content - handle both string and list formats
+                content = msg.get("content", "")
+
+                # If content is a list (Anthropic format with blocks), extract text
+                if isinstance(content, list):
+                    # Filter out empty blocks and extract text
+                    text_parts = []
+                    for block in content:
+                        if isinstance(block, dict):
+                            if block.get("type") == "text" and block.get("text"):
+                                text_parts.append(block["text"])
+                            elif block.get("type") == "tool_result":
+                                # For tool results, include the content
+                                result_content = block.get("content", "")
+                                if isinstance(result_content, str) and result_content:
+                                    text_parts.append(result_content)
+                                elif isinstance(result_content, list):
+                                    for item in result_content:
+                                        if isinstance(item, dict) and item.get("text"):
+                                            text_parts.append(item["text"])
+                        elif isinstance(block, str):
+                            text_parts.append(block)
+
+                    content = "\n".join(text_parts) if text_parts else ""
+
+                # Only add message if it has non-empty content
+                # (OpenAI allows empty final assistant message, but not others)
+                if content or (msg["role"] == "assistant" and msg == messages[-1]):
+                    openai_messages.append({
+                        "role": msg["role"],
+                        "content": content
+                    })
 
         # Convert Anthropic tools to OpenAI format if provided
         openai_tools = None
