@@ -18,6 +18,7 @@ Een geautomatiseerde AI-agent die wekelijks zoekt naar relevante Nederlandse AI-
 ### 2.1 Technische Randvoorwaarden
 - Python 3.10+
 - Claude Sonnet 4 API (Anthropic)
+- Portkey AI Gateway (optioneel - voor observability)
 - Multiple search providers (Serper/SearXNG/Brave/Google scraper)
 - Lokale file-based storage
 
@@ -32,7 +33,9 @@ Een geautomatiseerde AI-agent die wekelijks zoekt naar relevante Nederlandse AI-
 ```mermaid
 graph LR
     U[Gebruiker] -->|Start cyclus| GF[Guest Finder Agent]
-    GF -->|API calls| CA[Claude API]
+    GF -->|API calls| PK{Portkey Gateway<br/>optioneel}
+    PK -->|Routes to| CA[Claude API]
+    PK -.->|Logs metrics| PD[(Portkey Dashboard)]
     GF -->|Search queries| SP[Search Providers]
     SP -->|Resultaten| GF
     GF -->|Leest/schrijft| FS[(File Storage)]
@@ -59,6 +62,7 @@ graph LR
 
 ### 4.2 Technologie Keuzes
 - **Anthropic Claude**: Extended thinking voor planning en strategie
+- **Portkey AI Gateway**: Optionele observability laag voor monitoring en cost tracking
 - **Smart Search Tool**: Multi-provider fallback systeem
 - **File-based storage**: Simpel, geen database overhead
 
@@ -74,7 +78,8 @@ graph TD
     end
 
     subgraph "Core Components"
-        GFA --> C[Config]
+        GFA --> PC[PortkeyClient<br/>Adapter]
+        PC --> C[Config]
         GFA --> T[Tools]
         GFA --> PR[Prompts]
         GFA --> SST[SmartSearchTool]
@@ -101,6 +106,7 @@ graph TD
 | Component | Verantwoordelijkheid |
 |-----------|---------------------|
 | **GuestFinderAgent** | Orkestreert de 3 fases, beheert conversatie met Claude |
+| **PortkeyClient** | Adapter voor Anthropic SDK met optionele Portkey observability |
 | **SmartSearchTool** | Intelligente search met automatic fallback |
 | **SearchResultCache** | 1-dag caching van zoekresultaten |
 | **SearchProviders** | Abstractie laag voor verschillende search APIs |
@@ -110,7 +116,36 @@ graph TD
 
 ## 6. Runtime View
 
-### 6.1 Volledige Cyclus
+### 6.1 Portkey Observability Layer (Optioneel)
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant PA as PortkeyAdapter
+    participant PG as Portkey Gateway
+    participant C as Claude API
+    participant PD as Portkey Dashboard
+
+    A->>PA: messages.create() [Anthropic format]
+    Note over PA: Convert Anthropic → OpenAI format
+    PA->>PG: chat.completions.create() [OpenAI format]
+    PG->>PD: Log request metadata
+    Note over PG: Route to provider
+    PG->>C: messages API call
+    C->>PG: Response
+    PG->>PD: Log response + tokens + cost
+    Note over PA: Convert OpenAI → Anthropic format
+    PA->>A: Message response [Anthropic format]
+```
+
+**Adapter Werking:**
+
+- Agent code blijft ongewijzigd (Anthropic SDK)
+- Adapter converteert formats transparant
+- Portkey logt alle metrics automatisch
+- Fallback naar direct Anthropic als Portkey niet geconfigureerd
+
+### 6.2 Volledige Cyclus
 
 ```mermaid
 sequenceDiagram
@@ -233,13 +268,16 @@ graph TB
     end
 
     subgraph "External Services"
+        E0[Portkey Gateway<br/>optioneel]
         E1[Claude API<br/>Anthropic]
         E2[Serper API]
         E3[SearXNG Public<br/>Instances]
         E4[Brave Search API]
     end
 
-    P --> E1
+    P -.->|via Portkey| E0
+    E0 -.-> E1
+    P -->|direct fallback| E1
     P --> E2
     P --> E3
     P --> E4
@@ -264,10 +302,18 @@ graph TB
 - **Versioned**: Thresholds en parameters in code
 
 ### 8.4 Testing
-- **148 tests** over 8 risk areas
+
+- **157 tests** over 9 risk areas (incl. Portkey adapter)
 - **Mocking**: Responses library voor API calls
 - **Freezegun**: Tijd-gerelateerde tests
 - **Fixtures**: Herbruikbare test data
+
+### 8.5 Observability (Optioneel)
+
+- **Portkey Dashboard**: Real-time monitoring van API calls
+- **Metrics**: Token usage, costs, latency, error rates
+- **Adapter Pattern**: Transparante integratie zonder code wijzigingen
+- **Backwards Compatible**: Werkt met/zonder Portkey configuratie
 
 ## 9. Architectuurbeslissingen
 
@@ -319,15 +365,52 @@ graph TB
 
 **Consequenties**: ✅ Sneller en goedkoper, ❌ Mogelijk verouderde data
 
+### ADR-005: Portkey Observability via Adapter Pattern
+
+**Context**: Behoefte aan monitoring van API usage, costs en performance zonder bestaande code te wijzigen
+
+**Besluit**: Implementeer Portkey via adapter pattern die Anthropic SDK interface behoudt
+
+**Rationale**:
+
+- **Portkey Model Catalog** vereist OpenAI format, maar onze agents gebruiken Anthropic format
+- **Adapter pattern** converteert formats transparant zonder code wijzigingen
+- **Backwards compatible**: Werkt met/zonder Portkey configuratie
+- **Optional feature**: Toggle via environment variables
+
+**Alternatieven overwogen**:
+
+1. ❌ Hele codebase herschrijven naar OpenAI format → Te veel werk, niet backwards compatible
+2. ❌ Direct Anthropic SDK met custom base_url → Werkt niet met nieuwe Model Catalog
+3. ✅ Adapter pattern → Zero code changes, optioneel, backwards compatible
+
+**Conversies die de adapter doet**:
+
+- Message content blocks: Anthropic `[{type: "text", text: "..."}]` → OpenAI `"..."`
+- Tool definitions: `input_schema` → `parameters`
+- Tool results: `tool_result` role → `tool` role
+- Empty content filtering voor OpenAI compliance
+
+**Consequenties**:
+
+- ✅ Zero wijzigingen aan agent code
+- ✅ Real-time monitoring van costs en performance
+- ✅ Kan eenvoudig uitgeschakeld worden
+- ❌ Extra conversie laag (minimale performance impact)
+- ❌ Afhankelijkheid van portkey-ai package (optioneel)
+
+**Implementatie**: `src/utils/portkey_client.py` met 157 tests
+
 ## 10. Kwaliteitseisen
 
 | Kwaliteit | Target | Huidige Status |
 |-----------|--------|----------------|
-| **Test Coverage** | >80% | ✅ 148 tests, 8 risk areas |
+| **Test Coverage** | >80% | ✅ 157 tests, 9 risk areas |
 | **Availability** | >95% | ✅ Multi-provider fallback |
 | **Response Time** | <2 min per query | ✅ Met caching |
 | **Accuracy** | 2+ bronnen per kandidaat | ✅ Verificatie verplicht |
 | **Freshness** | Max 14 dagen oud | ✅ Recent search focus |
+| **Observability** | Real-time monitoring | ✅ Optioneel via Portkey |
 
 ## 11. Risico's en Technische Schuld
 
@@ -337,9 +420,10 @@ graph TB
 3. **Search Quality**: Google scraper kan breken → Niet primary provider
 
 ### Technische Schuld
+
 1. **Async Support**: SmartSearch kan async worden voor parallelle queries
 2. **Database**: Bij schaling naar team usage
-3. **Monitoring**: Nog geen alerting op failures
+3. **Portkey Alerting**: Dashboard heeft metrics maar nog geen automated alerting
 
 ## 12. Glossary
 
@@ -351,3 +435,6 @@ graph TB
 | **Extended Thinking** | Claude feature voor diep nadenken met thinking budget |
 | **Candidate** | Potentiële podcast gast met verificatie |
 | **Strategy** | JSON output van planning fase met queries |
+| **Adapter** | Wrapper pattern voor format conversie tussen APIs |
+| **Portkey** | AI Gateway voor observability en monitoring |
+| **Model Catalog** | Portkey's gecentraliseerde provider management systeem |
