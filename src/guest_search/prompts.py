@@ -13,14 +13,33 @@ Analyseer de situatie en maak een zoekstrategie voor deze week. Denk na over:
 1. **Actuele AI-thema's**: Welke AI-onderwerpen zijn deze week actueel in Nederland?
 2. **Sectorbalans**: Welke sectoren zijn onderbelicht? (zorg, energie, overheid, agrifood, finance, industrie, retail, onderwijs)
 3. **Diverse onderwerpen**: Zoek spreiding over Explainable AI, Green AI, MLOps/LLMOps, AI-ethiek, AI-Act, praktijkcases
-4. **Bronnen-strategie**: Welke Nederlandse bronnen zijn relevant?
-   - Vakmedia: AG Connect, Computable, Emerce, Automatiseringsgids
-   - Universiteiten: TU Delft, UvA, RUG, UT, UU (persberichten)
-   - Instituten: TNO, NLAIC, CWI
-   - Conferenties: AI & Big Data Expo, AIC4NL events
-   - LinkedIn: posts van Nederlandse AI-professionals
-5. **Leer van het verleden**: Als er learning insights beschikbaar zijn (zie boven), gebruik deze \
-om je strategie te verbeteren. Focus op query-types en bronnen die eerder succesvol waren.
+4. **Bronnen-strategie**: Welke Nederlandse bronnen zijn relevant? **BELANGRIJK: DIVERSIFIEER!**
+
+   **Prioriteit 1 - Vakmedia & Nieuws** (meest productief voor unieke personen):
+   - AG Connect, Computable, Emerce, Automatiseringsgids
+   - Tweakers, Data News, ICT&health
+   - NRC, FD artikelen over AI-projecten
+
+   **Prioriteit 2 - Universiteit persberichten** (unieke onderzoekers):
+   - TU Delft, UvA, RUG, UT, UU persberichten
+   - Specifieke labs: LIACS Leiden, CWI Amsterdam
+
+   **Prioriteit 3 - Bedrijven & Praktijk**:
+   - LinkedIn posts van thought leaders
+   - Bedrijfspersberichten over AI-implementaties
+   - Startup announcements (StartupJuncture, TechLeap)
+
+   **Prioriteit 4 - Instituten**:
+   - TNO, NLAIC, NFI, CBS AI-projecten
+
+   **LAAGSTE PRIORITEIT - Conferenties** (vaak al gebruikt):
+   - AI & Big Data Expo, AIC4NL events
+   - **GEBRUIK ALLEEN als andere bronnen weinig opleveren**
+
+5. **Leer van het verleden**:
+   - Als er learning insights beschikbaar zijn (zie boven), gebruik deze
+   - LET OP: Vermijd recent gebruikte bronnen (zie waarschuwing hierboven)
+   - Zoek ACTIEF naar nieuwe bronnen die nog niet zijn gebruikt
 
 ## Output verwacht
 
@@ -65,16 +84,31 @@ Rationale: {query_rationale}
 Voer de `web_search` tool uit met de gegeven query.
 
 ### Stap 2: Analyseer de zoekresultaten
-**LET OP**: Je krijgt alleen snippets, geen volledige pagina's. Zoek daarom naar:
-1. **Organisaties en congressen** die AI-experts vermelden (bijv. "AI Act Implementatie Congres", "TNO AI-onderzoek", "UvA AI Lab")
-2. **Persberichten en aankondigingen** met mogelijk namen van sprekers of onderzoekers
-3. **URLs die lijken te verwijzen naar personen** (bijv. LinkedIn profielen, university staff pages, speaker announcements)
+**LET OP**: Je krijgt alleen snippets, geen volledige pagina's. Zoek naar DIVERSE bronnen:
+
+**Prioriteit 1 - Vakmedia artikelen** (beste bron voor unieke personen):
+- AG Connect, Computable, Emerce artikelen met interviews
+- Case studies waar experts worden genoemd
+- Opinion pieces met auteurs
+
+**Prioriteit 2 - Universiteit & Onderzoek**:
+- Universiteit persberichten over nieuwe onderzoeksprojecten
+- Publicaties met hoofdonderzoekers
+- Lab pages met teamleden
+
+**Prioriteit 3 - Bedrijfspersberichten**:
+- Aankondigingen van nieuwe AI-functies (CTO, AI Lead, etc.)
+- Projectlanceringen met verantwoordelijke personen
+- LinkedIn artikelen van thought leaders
+
+**VERMIJD waar mogelijk**: Conferentie speaker lists (vaak al gebruikt)
 
 ### Stap 3: Verdiep je in veelbelovende URLs
-Voor veelbelovende URLs (bijv. congresprogramma's, sprekerlijsten, persberichten):
+Voor veelbelovende URLs:
 1. Gebruik `fetch_page_content` om de volledige pagina op te halen
 2. Zoek naar namen, functies en organisaties op die pagina
 3. Identificeer concrete personen die als gast interessant zouden zijn
+4. **VARIEER je bronnen** - niet alle kandidaten van dezelfde website halen
 
 ### Stap 4: Sla kandidaten op
 Als je een interessante persoon vindt met voldoende informatie:
@@ -90,7 +124,8 @@ Als je een interessante persoon vindt met voldoende informatie:
 
 **BELANGRIJK**:
 - Snippets bevatten zelden namen - je MOET daarom URLs fetchen met `fetch_page_content`
-- Focus op URLs van: congressen, sprekerlijsten, university pages, persberichten, LinkedIn
+- **DIVERSIFIEER bronnen**: Niet alle kandidaten van dezelfde bron/organisatie
+- Prioriteer: vakmedia > universiteiten > bedrijfspersberichten > conferenties
 - Je MOET kandidaten actief opslaan met `save_candidate` zodra je ze vindt
 
 ### Stap 5: Beslislogica

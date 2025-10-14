@@ -183,3 +183,79 @@ def test_track_query_performance_during_search(temp_data_dir, mock_anthropic_cli
     assert len(agent.current_session_queries) == 1
     assert agent.current_session_queries[0]["query"] == "AI experts TU Delft"
     assert agent.current_session_queries[0]["candidates_found"] == 3
+
+
+def test_get_recently_used_sources(temp_data_dir, mock_anthropic_client):
+    """Test getting recently used sources for deduplication."""
+    agent = GuestFinderAgent()
+
+    # Create mock history with recent and old sessions
+    now = datetime.now()
+    recent_date = now - timedelta(days=3)
+    old_date = now - timedelta(weeks=2)
+
+    agent.search_history["sessions"] = [
+        {
+            "date": recent_date.isoformat(),
+            "queries": [
+                {
+                    "query": "Recent query",
+                    "successful_sources": ["https://aic4nl.nl/event", "https://tudelft.nl/news"],
+                }
+            ],
+        },
+        {
+            "date": old_date.isoformat(),
+            "queries": [
+                {"query": "Old query", "successful_sources": ["https://old-source.nl"]}
+            ],
+        },
+    ]
+
+    # Get sources from last week
+    recent_sources = agent._get_recently_used_sources(weeks=1)
+
+    assert len(recent_sources) == 2
+    assert "https://aic4nl.nl/event" in recent_sources
+    assert "https://tudelft.nl/news" in recent_sources
+    assert "https://old-source.nl" not in recent_sources
+
+
+def test_get_recently_used_sources_empty(temp_data_dir, mock_anthropic_client):
+    """Test getting recently used sources when there are none."""
+    agent = GuestFinderAgent()
+
+    recent_sources = agent._get_recently_used_sources(weeks=1)
+
+    assert recent_sources == []
+
+
+def test_source_deduplication_in_insights(temp_data_dir, mock_anthropic_client):
+    """Test that recently used sources are identified for planning phase."""
+    agent = GuestFinderAgent()
+
+    now = datetime.now()
+
+    # Create session with sources
+    agent.search_history["sessions"] = [
+        {
+            "date": now.isoformat(),
+            "queries": [
+                {
+                    "query": "AI Act",
+                    "candidates_found": 5,
+                    "successful_sources": [
+                        "https://aic4nl.nl/event/ai-act-congress",
+                        "https://computable.nl/article/ai-act-implementation",
+                    ],
+                }
+            ],
+        }
+    ]
+
+    recent_sources = agent._get_recently_used_sources(weeks=1)
+
+    # Verify both sources are in the recent list
+    assert len(recent_sources) == 2
+    assert any("aic4nl.nl" in s for s in recent_sources)
+    assert any("computable.nl" in s for s in recent_sources)

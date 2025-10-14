@@ -79,6 +79,24 @@ class GuestFinderAgent:
         with open("data/search_history.json", "w", encoding="utf-8") as f:
             json.dump(self.search_history, f, indent=2, ensure_ascii=False)
 
+    def _get_recently_used_sources(self, weeks: int = 1):
+        """Haal bronnen op die recent zijn gebruikt (voor deduplicatie)"""
+        cutoff_date = datetime.now() - timedelta(weeks=weeks)
+        recent_sources = set()
+
+        for session in self.search_history.get("sessions", []):
+            try:
+                session_date = datetime.fromisoformat(session["date"])
+                if session_date >= cutoff_date:
+                    # Verzamel alle bronnen uit deze sessie
+                    for query in session.get("queries", []):
+                        for source in query.get("successful_sources", []):
+                            recent_sources.add(source)
+            except (ValueError, KeyError):
+                continue
+
+        return list(recent_sources)
+
     def _get_learning_insights(self, weeks: int = 4):
         """Analyseer recente search history voor learning insights"""
         cutoff_date = datetime.now() - timedelta(weeks=weeks)
@@ -247,6 +265,7 @@ class GuestFinderAgent:
 
         # Learning: Get insights from previous searches
         learning_insights = self._get_learning_insights(weeks=4)
+        recently_used_sources = self._get_recently_used_sources(weeks=1)
 
         # Format learning section for prompt
         if learning_insights and learning_insights["total_sessions"] > 0:
@@ -270,6 +289,21 @@ in {learning_insights['total_sessions']} sessies.
 
             avg = learning_insights["avg_candidates_per_query"]
             learning_section += f"\n**Gemiddeld**: {avg:.1f} kandidaten per query\n"
+
+            # Add recently used sources warning
+            if recently_used_sources:
+                learning_section += "\n\n⚠️ **Recent gebruikte bronnen** (laatste week):\n"
+                learning_section += (
+                    "Deze bronnen zijn recent gebruikt. "
+                    "Personen hiervan vallen mogelijk binnen de 8-weken exclusie.\n"
+                )
+                for source in recently_used_sources[:5]:
+                    domain = source.split("/")[2] if "/" in source else source
+                    learning_section += f"- {domain}\n"
+                learning_section += (
+                    "\n**Zoek bij voorkeur naar NIEUWE bronnen** "
+                    "om duplicaten te voorkomen.\n"
+                )
         else:
             learning_section = "## 🎓 Leergeschiedenis\n\nDit is je eerste zoeksessie. \
 Er is nog geen historische data beschikbaar.\n"
