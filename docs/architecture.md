@@ -48,7 +48,8 @@ graph LR
 
     FS --> F1[previous_guests.json]
     FS --> F2[search_cache.json]
-    FS --> F3[reports/*.md]
+    FS --> F3[search_history.json]
+    FS --> F4[reports/*.md]
 ```
 
 ## 4. Oplossingstrategie
@@ -56,9 +57,10 @@ graph LR
 ### 4.1 Kernprincipes
 1. **Multi-phase approach**: Planning → Zoeken → Rapporteren
 2. **AI-driven**: Claude agent met extended thinking voor strategische beslissingen
-3. **Search resilience**: Automatic fallback tussen meerdere search providers
-4. **Caching**: 1-dag cache om rate limits te beheersen
-5. **Verificatie**: Minimaal 2 bronnen per kandidaat
+3. **Learning system**: Agent leert van eerdere zoeksessies om strategie te verbeteren
+4. **Search resilience**: Automatic fallback tussen meerdere search providers
+5. **Caching**: 1-dag cache om rate limits te beheersen
+6. **Verificatie**: Minimaal 2 bronnen per kandidaat
 
 ### 4.2 Technologie Keuzes
 - **Anthropic Claude**: Extended thinking voor planning en strategie
@@ -96,8 +98,15 @@ graph TD
 
     subgraph "Storage"
         GFA --> PG[(previous_guests.json)]
+        GFA --> SH[(search_history.json)]
         SST --> SC[(search_cache.json)]
         P3 --> RP[(reports/*.md)]
+    end
+
+    subgraph "Learning System"
+        P1 -.->|Loads insights| SH
+        P2 -.->|Tracks performance| SH
+        P3 -.->|Saves session| SH
     end
 ```
 
@@ -110,8 +119,9 @@ graph TD
 | **SmartSearchTool** | Intelligente search met automatic fallback |
 | **SearchResultCache** | 1-dag caching van zoekresultaten |
 | **SearchProviders** | Abstractie laag voor verschillende search APIs |
+| **Learning System** | Tracked query performance en genereert insights voor verbetering |
 | **Tools** | Agent tool definitions (web_search, check_previous_guests, save_candidate) |
-| **Prompts** | Gestructureerde prompts voor elke fase |
+| **Prompts** | Gestructureerde prompts voor elke fase (inclusief learning insights) |
 | **Config** | Centrale configuratie (API keys, thresholds) |
 
 ## 6. Runtime View
@@ -159,14 +169,17 @@ sequenceDiagram
 
     rect rgb(200, 220, 240)
         Note over A,C: FASE 1: Planning
-        A->>C: Planning prompt + extended thinking
-        C->>A: Search strategy JSON
+        A->>FS: Load search_history.json
+        FS->>A: Learning insights (laatste 4 weken)
+        A->>C: Planning prompt + learning insights + extended thinking
+        C->>A: Search strategy JSON (informed by history)
         A->>A: Parse strategy
     end
 
     rect rgb(220, 240, 200)
         Note over A,S: FASE 2: Zoeken (iteratief)
         loop Voor elke query (max 12)
+            A->>A: Track candidates_before
             A->>C: Execute search query
             C->>A: web_search tool call
             A->>S: search(query)
@@ -182,6 +195,7 @@ sequenceDiagram
             FS->>A: Guest history
             C->>A: save_candidate tool call
             A->>A: Add to candidates list
+            A->>A: Track performance (candidates found, sources used)
             alt Target bereikt
                 A->>A: Break loop
             end
@@ -194,6 +208,7 @@ sequenceDiagram
         C->>A: Markdown rapport
         A->>FS: Save report
         A->>FS: Update previous_guests.json
+        A->>FS: Save session to search_history.json (all query performance)
         A->>U: Rapport klaar
     end
 ```
@@ -244,6 +259,40 @@ sequenceDiagram
     end
 ```
 
+### 6.3 Learning System Flow
+
+```mermaid
+sequenceDiagram
+    participant P as Planning Phase
+    participant S as Search Phase
+    participant R as Report Phase
+    participant H as search_history.json
+
+    Note over P,H: WEEK 1: First Run
+    P->>H: Load history (empty)
+    Note over P: No insights available yet
+    S->>S: Execute queries & track
+    S->>S: Record: query → candidates, sources
+    R->>H: Save session with all query performance
+
+    Note over P,H: WEEK 2+: Learning Active
+    P->>H: Load history
+    H->>P: Last 4 weeks of query performance
+    Note over P: Analyze insights:<br/>- Top queries<br/>- Best sources<br/>- Avg performance
+    P->>P: Generate strategy informed by history
+    Note over P: Focus on proven successful patterns
+    S->>S: Execute improved queries
+    S->>S: Track new performance data
+    R->>H: Append new session
+```
+
+**Learning Cycle:**
+
+1. **Planning gebruikt insights**: Agent ziet welke queries/bronnen eerder succesvol waren
+2. **Search tracked performance**: Elke query registreert resultaten en bronnen
+3. **Report bewaart sessie**: Alle performance data wordt opgeslagen voor toekomstige runs
+4. **Verbetering over tijd**: Elke volgende run is beter geïnformeerd
+
 ## 7. Deployment View
 
 ```mermaid
@@ -257,14 +306,16 @@ graph TB
 
         subgraph "Local Storage"
             D1[data/previous_guests.json]
-            D2[data/cache/search_results.json]
-            D3[output/reports/]
+            D2[data/search_history.json]
+            D3[data/cache/search_results.json]
+            D4[output/reports/]
         end
 
         M --> P
         P --> D1
         P --> D2
         P --> D3
+        P --> D4
     end
 
     subgraph "External Services"
@@ -303,7 +354,7 @@ graph TB
 
 ### 8.4 Testing
 
-- **157 tests** over 9 risk areas (incl. Portkey adapter)
+- **187 tests** over 11 risk areas (incl. Portkey adapter en learning system)
 - **Mocking**: Responses library voor API calls
 - **Freezegun**: Tijd-gerelateerde tests
 - **Fixtures**: Herbruikbare test data
@@ -401,11 +452,50 @@ graph TB
 
 **Implementatie**: `src/utils/portkey_client.py` met 157 tests
 
+### ADR-006: Query Performance Learning System
+
+**Context**: Agent maakt elke week opnieuw een zoekstrategie zonder te leren van eerdere resultaten
+
+**Besluit**: Implementeer automatisch learning systeem dat query performance tracked en gebruikt voor toekomstige strategieën
+
+**Rationale**:
+- **Efficiency**: Agent verspilt tijd aan queries die niet werken
+- **Improvement**: Systeem wordt beter over tijd zonder handmatige interventie
+- **Transparency**: Alle data is inzichtelijk in JSON format
+- **No AI training needed**: Gebruikt simpele metrics (query → candidates count)
+
+**Alternatieven overwogen**:
+1. ❌ Manual tuning van prompts → Te arbeidsintensief, niet schaalbaar
+2. ❌ RAG met embeddings → Overkill voor simpele performance metrics
+3. ✅ File-based query tracking → Simple, transparent, effective
+
+**Implementatie details**:
+- Track per query: text, candidates found, successful sources, timestamp
+- Analyze laatste 4 weken voor insights
+- Inject insights in planning prompt
+- Agent ziet top queries, best sources, averages
+- Zero manual intervention needed
+
+**Consequenties**:
+- ✅ Agent verbetert automatisch over tijd
+- ✅ Transparante learning (geen black box)
+- ✅ Minimal code complexity (200 LOC)
+- ✅ Well tested (6 new unit tests)
+- ❌ Eerste run heeft geen insights (cold start)
+- ❌ Extra storage file (search_history.json)
+
+**Toekomstige uitbreidingen mogelijk**:
+- Level 2: Agent reflecties (semantic learning)
+- Level 3: Real-time strategy adaptation
+- Level 4: Cross-session pattern recognition
+
+**Implementatie**: Learning methods in `GuestFinderAgent`, documentatie in `docs/LEARNING_SYSTEM.md`
+
 ## 10. Kwaliteitseisen
 
 | Kwaliteit | Target | Huidige Status |
 |-----------|--------|----------------|
-| **Test Coverage** | >80% | ✅ 157 tests, 9 risk areas |
+| **Test Coverage** | >80% | ✅ 187 tests, 11 risk areas |
 | **Availability** | >95% | ✅ Multi-provider fallback |
 | **Response Time** | <2 min per query | ✅ Met caching |
 | **Accuracy** | 2+ bronnen per kandidaat | ✅ Verificatie verplicht |
