@@ -10,11 +10,12 @@ from rich.panel import Panel
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
+from src.utils.portkey_client import get_anthropic_client
+from src.utils.smart_search_tool import SmartSearchTool
+
 from .config import Config
 from .prompts import PLANNING_PROMPT, REPORT_GENERATION_PROMPT, SEARCH_EXECUTION_PROMPT
 from .tools import get_tools
-from src.utils.portkey_client import get_anthropic_client
-from src.utils.smart_search_tool import SmartSearchTool
 
 
 class GuestFinderAgent:
@@ -27,6 +28,9 @@ class GuestFinderAgent:
         self.smart_search = SmartSearchTool(enable_cache=True)
         # Rich console for pretty output
         self.console = Console()
+        # Learning: Track query performance
+        self.search_history = self._load_search_history()
+        self.current_session_queries = []
 
     def _load_previous_guests(self):
         """Laad lijst van eerder aanbevolen gasten"""
@@ -58,6 +62,70 @@ class GuestFinderAgent:
                 continue
 
         return recent_guests
+
+    def _load_search_history(self):
+        """Laad search history voor learning"""
+        try:
+            with open("data/search_history.json", encoding="utf-8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {"sessions": []}
+
+    def _save_search_history(self):
+        """Bewaar search history"""
+        import os
+
+        os.makedirs("data", exist_ok=True)
+        with open("data/search_history.json", "w", encoding="utf-8") as f:
+            json.dump(self.search_history, f, indent=2, ensure_ascii=False)
+
+    def _get_learning_insights(self, weeks: int = 4):
+        """Analyseer recente search history voor learning insights"""
+        cutoff_date = datetime.now() - timedelta(weeks=weeks)
+        recent_sessions = []
+
+        for session in self.search_history.get("sessions", []):
+            try:
+                session_date = datetime.fromisoformat(session["date"])
+                if session_date >= cutoff_date:
+                    recent_sessions.append(session)
+            except (ValueError, KeyError):
+                continue
+
+        if not recent_sessions:
+            return None
+
+        # Verzamel alle queries met hun performance
+        all_queries = []
+        for session in recent_sessions:
+            for query in session.get("queries", []):
+                all_queries.append(query)
+
+        # Sorteer queries op candidates gevonden (meest succesvol eerst)
+        successful_queries = [q for q in all_queries if q.get("candidates_found", 0) > 0]
+        successful_queries.sort(key=lambda x: x.get("candidates_found", 0), reverse=True)
+
+        # Verzamel meest productieve bronnen
+        source_stats = {}
+        for query in all_queries:
+            for source in query.get("successful_sources", []):
+                source_stats[source] = source_stats.get(source, 0) + 1
+
+        # Top 5 bronnen
+        top_sources = sorted(source_stats.items(), key=lambda x: x[1], reverse=True)[:5]
+
+        return {
+            "total_sessions": len(recent_sessions),
+            "total_queries": len(all_queries),
+            "successful_queries": len(successful_queries),
+            "top_performing_queries": successful_queries[:5],
+            "top_sources": [source for source, count in top_sources],
+            "avg_candidates_per_query": (
+                sum(q.get("candidates_found", 0) for q in all_queries) / len(all_queries)
+                if all_queries
+                else 0
+            ),
+        }
 
     def _handle_tool_call(self, tool_name, tool_input, silent=False):
         """Verwerk tool calls van de agent"""
@@ -152,7 +220,12 @@ class GuestFinderAgent:
             company = tool_input["company"]
             # TODO: Implement real LinkedIn search logic here
             # For now, return a mock LinkedIn profile URL based on name and company
-            linkedin_url = f"https://www.linkedin.com/search/results/people/?keywords={name.replace(' ', '%20')}%20{company.replace(' ', '%20')}"
+            name_encoded = name.replace(" ", "%20")
+            company_encoded = company.replace(" ", "%20")
+            linkedin_url = (
+                f"https://www.linkedin.com/search/results/people/"
+                f"?keywords={name_encoded}%20{company_encoded}"
+            )
             return {"linkedin_url": linkedin_url, "status": "success"}
 
         return {"error": "Unknown tool"}
@@ -172,7 +245,40 @@ class GuestFinderAgent:
         current_date = datetime.now().strftime("%Y-%m-%d")
         day_of_week = datetime.now().strftime("%A")
 
-        prompt = PLANNING_PROMPT.format(current_date=current_date, day_of_week=day_of_week)
+        # Learning: Get insights from previous searches
+        learning_insights = self._get_learning_insights(weeks=4)
+
+        # Format learning section for prompt
+        if learning_insights and learning_insights["total_sessions"] > 0:
+            learning_section = f"""## 🎓 Leergeschiedenis (laatste 4 weken)
+
+Je hebt de afgelopen 4 weken {learning_insights['total_queries']} zoekopdrachten uitgevoerd \
+in {learning_insights['total_sessions']} sessies.
+
+**Succesvol gebleken queries** (vonden meeste kandidaten):
+"""
+            for i, query in enumerate(learning_insights["top_performing_queries"][:3], 1):
+                query_text = query["query"]
+                candidates = query["candidates_found"]
+                learning_section += f'\n{i}. "{query_text}" → {candidates} kandidaten'
+
+            if learning_insights["top_sources"]:
+                learning_section += "\n\n**Meest productieve bronnen:**\n"
+                for source in learning_insights["top_sources"][:5]:
+                    domain = source.split("/")[2] if "/" in source else source
+                    learning_section += f"- {domain}\n"
+
+            avg = learning_insights["avg_candidates_per_query"]
+            learning_section += f"\n**Gemiddeld**: {avg:.1f} kandidaten per query\n"
+        else:
+            learning_section = "## 🎓 Leergeschiedenis\n\nDit is je eerste zoeksessie. \
+Er is nog geen historische data beschikbaar.\n"
+
+        prompt = PLANNING_PROMPT.format(
+            current_date=current_date,
+            day_of_week=day_of_week,
+            learning_section=learning_section,
+        )
 
         with self.console.status("[cyan]Agent denkt na over zoekstrategie...[/cyan]"):
             response = self.client.messages.create(
@@ -297,6 +403,9 @@ class GuestFinderAgent:
             )
 
             for i, query_obj in enumerate(queries[: Config.MAX_SEARCH_ITERATIONS]):
+                # Learning: Track candidates before query
+                candidates_before = len(self.candidates)
+
                 # Update progress description with current query
                 short_query = query_obj["query"][:50]
                 progress.update(
@@ -322,6 +431,9 @@ class GuestFinderAgent:
                 # Voeg toe aan conversatie
                 conversation.append({"role": "user", "content": prompt})
 
+                # Learning: Track sources used in this query
+                sources_used = []
+
                 # Agent doet zoekopdracht
                 response = self.client.messages.create(
                     model=Config.MODEL,
@@ -340,6 +452,10 @@ class GuestFinderAgent:
                     elif block.type == "tool_use":
                         # Voer tool uit (silent)
                         result = self._handle_tool_call(block.name, block.input, silent=True)
+
+                        # Learning: Track successful fetch_page_content calls
+                        if block.name == "fetch_page_content" and result.get("status") == "success":
+                            sources_used.append(block.input.get("url", ""))
 
                         # Voeg tool use en result toe aan conversatie
                         assistant_message["content"].append(block)
@@ -363,6 +479,20 @@ class GuestFinderAgent:
                 # Voeg laatste assistant message toe als die text bevat
                 if assistant_message["content"]:
                     conversation.append(assistant_message)
+
+                # Learning: Calculate candidates found by this query
+                candidates_found = len(self.candidates) - candidates_before
+
+                # Learning: Record query performance
+                query_record = {
+                    "query": query_obj["query"],
+                    "rationale": query_obj.get("rationale", ""),
+                    "priority": query_obj.get("priority", "medium"),
+                    "candidates_found": candidates_found,
+                    "successful_sources": sources_used,
+                    "timestamp": datetime.now().isoformat(),
+                }
+                self.current_session_queries.append(query_record)
 
                 # Update progress
                 progress.update(task, advance=1, candidates=len(self.candidates))
@@ -463,6 +593,17 @@ class GuestFinderAgent:
 
         # Save current candidates for interactive selector
         self._save_candidates_for_selector()
+
+        # Learning: Save session data to search history
+        session_record = {
+            "date": datetime.now().isoformat(),
+            "week_number": week_number,
+            "total_queries": len(self.current_session_queries),
+            "total_candidates": len(self.candidates),
+            "queries": self.current_session_queries,
+        }
+        self.search_history["sessions"].append(session_record)
+        self._save_search_history()
 
         return report
 

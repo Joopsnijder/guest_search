@@ -9,6 +9,7 @@ AI-driven podcast guest finder and topic researcher with intelligent search and 
 ## Features
 
 🤖 **AI-Powered Search** - Claude Sonnet 4 agent with extended thinking for strategic guest finding
+🎓 **Learning System** - Agent learns from previous searches to improve strategy over time
 🔍 **Topic Research** - Separate tool to find interesting AI topics for your podcast
 🔄 **Multi-Provider Fallback** - Serper → SearXNG → Brave → Google Scraper
 ⚡ **Smart Rate Limiting** - Automatic provider skipping on 402/429 errors
@@ -16,7 +17,7 @@ AI-driven podcast guest finder and topic researcher with intelligent search and 
 🎯 **Interactive Selection** - Beautiful terminal UI to review and select guests
 📋 **Trello Integration** - One-click export of guests to Trello boards
 📝 **Rich Markdown Reports** - Beautiful terminal-rendered reports with syntax highlighting
-✅ **Well Tested** - 181 tests covering 10 critical areas (guest finder + topic researcher)
+✅ **Well Tested** - 187 tests covering 11 critical areas (guest finder + topic researcher + learning)
 📊 **Arc42 Documentation** - Complete architecture documentation with Mermaid diagrams
 
 ## Quick Start
@@ -217,6 +218,18 @@ mypy src/
 ```
 
 ## Features
+
+### Learning System
+The agent automatically learns from previous search sessions to improve its strategy:
+- 📈 Tracks query performance (which searches find the most candidates)
+- 🎯 Identifies most productive sources and websites
+- 🧠 Uses historical data to make better search strategies
+- 📊 Analyzes last 4 weeks of search history
+- 🔄 Improves over time without manual intervention
+
+The agent shows learning insights during the planning phase, helping it focus on proven successful approaches.
+
+See [LEARNING_SYSTEM.md](docs/LEARNING_SYSTEM.md) for detailed documentation.
 
 ### Smart Search with Rate Limit Handling
 The search tool automatically detects and skips rate-limited providers for the duration of the session:

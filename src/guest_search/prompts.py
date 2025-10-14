@@ -4,6 +4,8 @@ podcast AIToday Live.
 Huidige datum: {current_date}
 Dag van de week: {day_of_week}
 
+{learning_section}
+
 ## Jouw taak in deze planning-fase
 
 Analyseer de situatie en maak een zoekstrategie voor deze week. Denk na over:
@@ -17,6 +19,8 @@ Analyseer de situatie en maak een zoekstrategie voor deze week. Denk na over:
    - Instituten: TNO, NLAIC, CWI
    - Conferenties: AI & Big Data Expo, AIC4NL events
    - LinkedIn: posts van Nederlandse AI-professionals
+5. **Leer van het verleden**: Als er learning insights beschikbaar zijn (zie boven), gebruik deze \
+om je strategie te verbeteren. Focus op query-types en bronnen die eerder succesvol waren.
 
 ## Output verwacht
 
