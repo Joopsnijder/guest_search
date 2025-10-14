@@ -26,6 +26,7 @@ class TopicFinderAgent:
         self.topics = []
         self.smart_search = SmartSearchTool(enable_cache=True)
         self.console = Console()
+        self.current_activity = "Initialiseren..."
 
     def _get_topic_tools(self):
         """Definieer de tools specifiek voor topic search."""
@@ -137,11 +138,21 @@ class TopicFinderAgent:
             },
         ]
 
-    def _handle_tool_call(self, tool_name, tool_input, silent=False):
+    def _handle_tool_call(self, tool_name, tool_input, silent=False, progress=None, task=None):
         """Verwerk tool calls van de agent."""
 
         if tool_name == "web_search":
             query = tool_input["query"]
+
+            # Update progress with current search query
+            if progress and task is not None:
+                short_query = query[:45] if len(query) > 45 else query
+                progress.update(
+                    task,
+                    description=f"[cyan]🔍 Zoeken: {short_query}...",
+                    topics=len(self.topics),
+                )
+
             search_result = self.smart_search.search(query, num_results=10)
 
             if search_result["results"]:
@@ -161,6 +172,17 @@ class TopicFinderAgent:
 
         elif tool_name == "fetch_page_content":
             url = tool_input["url"]
+
+            # Update progress with domain being fetched
+            if progress and task is not None:
+                from urllib.parse import urlparse
+
+                domain = urlparse(url).netloc or url[:30]
+                progress.update(
+                    task,
+                    description=f"[cyan]📄 Ophalen: {domain}...",
+                    topics=len(self.topics),
+                )
 
             try:
                 import requests
@@ -204,6 +226,17 @@ class TopicFinderAgent:
 
         elif tool_name == "save_topic":
             self.topics.append(tool_input)
+
+            # Update progress with saved topic
+            if progress and task is not None:
+                topic_title = tool_input.get("title", "Onbekend")
+                short_title = topic_title[:35] if len(topic_title) > 35 else topic_title
+                progress.update(
+                    task,
+                    description=f"[green]💾 Opgeslagen: {short_title}...",
+                    topics=len(self.topics),
+                )
+
             return {"status": "saved", "total_topics": len(self.topics)}
 
         return {"error": "Unknown tool"}
@@ -271,8 +304,10 @@ class TopicFinderAgent:
                     elif block.type == "tool_use":
                         has_tool_calls = True
 
-                        # Execute tool (silent)
-                        result = self._handle_tool_call(block.name, block.input, silent=True)
+                        # Execute tool (silent) with progress updates
+                        result = self._handle_tool_call(
+                            block.name, block.input, silent=True, progress=progress, task=task
+                        )
 
                         # Add tool use and result to conversation
                         assistant_message["content"].append(block)
