@@ -4,7 +4,6 @@ import json
 from datetime import datetime
 from typing import Any, cast
 
-from anthropic import Anthropic
 from anthropic.types import ToolParam
 from rich.console import Console
 from rich.live import Live
@@ -15,6 +14,7 @@ from rich.table import Table
 
 from src.guest_search.config import Config
 from src.topic_search.prompts import TOPIC_REPORT_GENERATION_PROMPT, TOPIC_SEARCH_PROMPT
+from src.utils.portkey_client import get_anthropic_client
 from src.utils.smart_search_tool import SmartSearchTool
 
 
@@ -22,7 +22,7 @@ class TopicFinderAgent:
     """Agent die interessante AI-topics zoekt voor de podcast."""
 
     def __init__(self):
-        self.client = Anthropic(api_key=Config.ANTHROPIC_API_KEY)
+        self.client = get_anthropic_client(Config.ANTHROPIC_API_KEY)
         self.topics = []
         self.smart_search = SmartSearchTool(enable_cache=True)
         self.console = Console()

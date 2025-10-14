@@ -2,7 +2,6 @@ import json
 from datetime import datetime, timedelta
 from typing import cast
 
-from anthropic import Anthropic
 from anthropic.types import ToolParam
 from rich.console import Console
 from rich.live import Live
@@ -14,12 +13,13 @@ from rich.table import Table
 from .config import Config
 from .prompts import PLANNING_PROMPT, REPORT_GENERATION_PROMPT, SEARCH_EXECUTION_PROMPT
 from .tools import get_tools
+from src.utils.portkey_client import get_anthropic_client
 from src.utils.smart_search_tool import SmartSearchTool
 
 
 class GuestFinderAgent:
     def __init__(self):
-        self.client = Anthropic(api_key=Config.ANTHROPIC_API_KEY)
+        self.client = get_anthropic_client(Config.ANTHROPIC_API_KEY)
         self.tools = get_tools()
         self.candidates = []
         self.previous_guests = self._load_previous_guests()
