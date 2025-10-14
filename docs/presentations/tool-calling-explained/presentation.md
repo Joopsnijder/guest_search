@@ -918,7 +918,7 @@ Prof. Jan van TU Delft, ...
 3. Inspect conversatie geschiedenis
 4. Debug een tool failure
 
-`python main.py` met debug mode
+`python guest_search.py` met debug mode
 
 ---
 

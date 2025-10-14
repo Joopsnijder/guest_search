@@ -71,7 +71,7 @@ graph LR
 ```mermaid
 graph TD
     subgraph "Guest Finder Agent"
-        M[main.py] --> GFA[GuestFinderAgent]
+        M[guest_search.py] --> GFA[GuestFinderAgent]
         GFA --> P1[Planning Phase]
         GFA --> P2[Search Phase]
         GFA --> P3[Report Phase]
@@ -250,7 +250,7 @@ sequenceDiagram
 graph TB
     subgraph "Development Machine"
         subgraph "Python Environment"
-            M[main.py]
+            M[guest_search.py]
             P[guest_search package]
             V[.venv]
         end

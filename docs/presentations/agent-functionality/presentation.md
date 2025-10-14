@@ -249,7 +249,7 @@ graph LR
 graph LR
     A[Run topic_search.py] --> B[Get 6-8 Topics]
     B --> C[Note search keywords]
-    C --> D[Run main.py]
+    C --> D[Run guest_search.py]
     D --> E[Use keywords in search]
     E --> F[Find Relevant Guests]
     F --> G[Export to Trello]
@@ -395,7 +395,7 @@ TRELLO_TOKEN=your_token
 
 ```bash
 # Complete workflow
-python main.py
+python guest_search.py
 ```
 
 **Flow:**

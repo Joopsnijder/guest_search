@@ -47,7 +47,7 @@ Geautomatiseerde content discovery voor AIToday Live podcast:
 
 ```mermaid
 graph TB
-    U[Gebruiker] -->|main.py| GF[Guest Finder<br/>Agent]
+    U[Gebruiker] -->|guest_search.py| GF[Guest Finder<br/>Agent]
     U -->|topic_search.py| TF[Topic Finder<br/>Agent]
 
     GF -->|API calls| CA[Claude API]
@@ -93,7 +93,7 @@ graph TB
 ```mermaid
 graph TD
     subgraph "Entry Points"
-        M1[main.py] --> GFA[GuestFinderAgent]
+        M1[guest_search.py] --> GFA[GuestFinderAgent]
         M2[topic_search.py] --> TFA[TopicFinderAgent]
         M3[select_guests.py] --> IS[InteractiveSelector]
     end
@@ -194,7 +194,7 @@ sequenceDiagram
 ```mermaid
 graph TB
     subgraph "Local Machine"
-        M[main.py]
+        M[guest_search.py]
         P[guest_search]
         D[(data/)]
     end

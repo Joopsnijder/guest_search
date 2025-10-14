@@ -19,7 +19,7 @@ Find potential podcast guests using AI-powered search and analysis.
 ### Basic Usage
 
 ```bash
-python main.py
+python guest_search.py
 ```
 
 ### Workflow
@@ -235,8 +235,8 @@ Browse and select guests using the beautiful terminal UI.
 ### Launch Options
 
 ```bash
-# After running main.py (automatic)
-python main.py
+# After running guest_search.py (automatic)
+python guest_search.py
 
 # Standalone (uses existing data)
 python select_guests.py

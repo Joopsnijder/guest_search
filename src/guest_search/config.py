@@ -10,8 +10,8 @@ class Config:
     MODEL = "claude-sonnet-4-20250514"
 
     # Planning fase
-    PLANNING_MAX_TOKENS = 12000  # Must be > thinking budget
-    PLANNING_THINKING_BUDGET = 8000
+    PLANNING_MAX_TOKENS = 50000  # Must be > thinking budget
+    PLANNING_THINKING_BUDGET = 20000
 
     # Zoek fase
     SEARCH_MAX_TOKENS = 8000

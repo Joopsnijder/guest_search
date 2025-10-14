@@ -390,7 +390,7 @@ TRELLO_TOKEN=token
 **Complete Workflow:**
 
 ```bash
-python main.py
+python guest_search.py
 ```
 
 **What Happens:**

@@ -336,7 +336,7 @@ output/topic_reports/
 graph LR
     A[Run topic_search.py] --> B[Get 6-8 Topics]
     B --> C[Note search keywords]
-    C --> D[Run main.py]
+    C --> D[Run guest_search.py]
     D --> E[Use keywords in search]
     E --> F[Find Relevant Guests]
     F --> G[Export to Trello]
@@ -590,7 +590,7 @@ graph LR
 **Steps:**
 1. **09:00** - Run `python topic_search.py`
 2. **09:15** - Review 6-8 topics, extract keywords
-3. **14:00** - Run `python main.py` with keywords
+3. **14:00** - Run `python guest_search.py` with keywords
 4. **14:30** - Select guests, export to Trello
 5. **Weekly** - Review and clean up Trello board
 

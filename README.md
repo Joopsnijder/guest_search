@@ -57,7 +57,7 @@ Optional (for Trello integration):
 
 ```bash
 # Run the complete workflow (recommended)
-python main.py
+python guest_search.py
 ```
 
 This will:
@@ -232,7 +232,7 @@ See [RATE_LIMIT_HANDLING.md](docs/RATE_LIMIT_HANDLING.md) for details.
 
 ```
 guest_search/
-├── main.py                        # Guest finder entry point
+├── guest_search.py                # Guest finder entry point
 ├── topic_search.py                # Topic researcher entry point
 ├── select_guests.py               # Interactive guest selector
 ├── demo_ui.py                     # UI demo (no Trello)

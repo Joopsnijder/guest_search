@@ -37,7 +37,7 @@ Na het draaien van de agent:
 
 ```bash
 # Voer de agent uit
-python main.py
+python guest_search.py
 
 # Selecteer en stuur gasten naar Trello
 python select_guests.py
