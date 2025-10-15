@@ -84,9 +84,11 @@ Rationale: {query_rationale}
 Voer de `web_search` tool uit met de gegeven query.
 
 ### Stap 2: Analyseer de zoekresultaten
-**LET OP**: Je krijgt alleen snippets, geen volledige pagina's. Zoek naar DIVERSE bronnen:
+**KRITISCH**: Snippets bevatten NOOIT namen - je MOET URLs fetchen!
 
-**Prioriteit 1 - Vakmedia artikelen** (beste bron voor unieke personen):
+Zoek in de snippets naar URLs die waarschijnlijk personen bevatten:
+
+**Prioriteit 1 - Vakmedia artikelen** (beste bron):
 - AG Connect, Computable, Emerce artikelen met interviews
 - Case studies waar experts worden genoemd
 - Opinion pieces met auteurs
@@ -99,16 +101,20 @@ Voer de `web_search` tool uit met de gegeven query.
 **Prioriteit 3 - Bedrijfspersberichten**:
 - Aankondigingen van nieuwe AI-functies (CTO, AI Lead, etc.)
 - Projectlanceringen met verantwoordelijke personen
-- LinkedIn artikelen van thought leaders
 
-**VERMIJD waar mogelijk**: Conferentie speaker lists (vaak al gebruikt)
+**VERMIJD**: Conferentie speaker lists (vaak al gebruikt)
 
-### Stap 3: Verdiep je in veelbelovende URLs
-Voor veelbelovende URLs:
-1. Gebruik `fetch_page_content` om de volledige pagina op te halen
-2. Zoek naar namen, functies en organisaties op die pagina
-3. Identificeer concrete personen die als gast interessant zouden zijn
-4. **VARIEER je bronnen** - niet alle kandidaten van dezelfde website halen
+### Stap 3: Fetch ALLE relevante URLs (VERPLICHT!)
+**CRITICAL**: Voor ELKE URL die lijkt te verwijzen naar een artikel, persbericht, of project:
+
+1. **Je MOET `fetch_page_content` gebruiken** - snippets zijn ONBRUIKBAAR voor namen
+2. Selecteer minimaal 2-3 URLs per web_search resultaat
+3. Zoek op de gefetchte pagina naar:
+   - Volledige namen (voornaam + achternaam)
+   - Functietitels (Dr., Prof., CEO, CTO, Lead, etc.)
+   - Organisaties
+   - Waarom deze persoon relevant is
+4. **VARIEER je bronnen** - niet alle kandidaten van dezelfde website
 
 ### Stap 4: Sla kandidaten op
 Als je een interessante persoon vindt met voldoende informatie:
@@ -122,21 +128,47 @@ Als je een interessante persoon vindt met voldoende informatie:
    - sources: Lijst met URLs (minimaal 1, maximaal 3)
    - contact_info: Email en/of LinkedIn als beschikbaar (leeg object als niet beschikbaar)
 
-**BELANGRIJK**:
-- Snippets bevatten zelden namen - je MOET daarom URLs fetchen met `fetch_page_content`
-- **DIVERSIFIEER bronnen**: Niet alle kandidaten van dezelfde bron/organisatie
-- Prioriteer: vakmedia > universiteiten > bedrijfspersberichten > conferenties
-- Je MOET kandidaten actief opslaan met `save_candidate` zodra je ze vindt
+**🚨 KRITISCHE REGELS - GEEN UITZONDERINGEN**:
+1. **ALTIJD `fetch_page_content` gebruiken** - Snippets bevatten NOOIT namen!
+2. **Minimaal 2-3 URLs fetchen** per web_search - anders vind je niets
+3. **LET OP**: Als je fetch_page_content NIET gebruikt = 0 kandidaten gegarandeerd
+4. **DIVERSIFIEER bronnen**: Niet alle kandidaten van dezelfde website
+5. **Prioriteer**: vakmedia > universiteiten > bedrijfspersberichten > conferenties
+6. **Save direct**: Zodra je een naam+organisatie+rol hebt → `save_candidate`
 
 ### Stap 5: Beslislogica
 - Als je {target_candidates} kandidaten hebt gevonden: je bent klaar
 - Anders: ga systematisch door met de volgende zoekopdracht
 
-## Voorbeeld workflow
-1. web_search("AI Act implementatie Nederland bedrijven praktijk 2025")
-2. Zie resultaat: "AI Act Implementatie Congres: Van onduidelijkheid naar daadkracht" - https://aic4nl.nl/evenement/ai-act-implementatie-congres/
-3. fetch_page_content("https://aic4nl.nl/evenement/ai-act-implementatie-congres/")
-4. Vind op pagina: "Spreker: Dr. Sarah Veldman, Senior AI Policy Advisor bij TNO"
+## ✅ CORRECTE Workflow (VOLG DIT ALTIJD!)
+
+**Stap 1:** web_search("AI zorg Nederland ziekenhuizen 2025")
+
+**Stap 2:** Analyseer snippets - zie resultaten:
+- URL 1: https://icthealth.nl/nieuws/ai-voorspelt-hartinfarct
+- URL 2: https://mxi.nl/uploads/files/ai-monitor-ziekenhuizen-2025.pdf
+- URL 3: https://philips.nl/news/ai-innovatie-centrum
+
+**Stap 3:** Fetch ALLE 3 URLs (VERPLICHT!):
+- fetch_page_content("https://icthealth.nl/nieuws/ai-voorspelt-hartinfarct")
+  → Vind: "Dr. Lisa van Dam, cardioloog AMC Amsterdam"
+  → save_candidate(name="Lisa van Dam", org="AMC", role="Cardioloog", ...)
+
+- fetch_page_content("https://mxi.nl/uploads/files/ai-monitor-ziekenhuizen-2025.pdf")
+  → Vind: "Onderzoek geleid door Prof. Jan Klerk, Radboud UMC"
+  → save_candidate(name="Jan Klerk", org="Radboud UMC", role="Professor", ...)
+
+- fetch_page_content("https://philips.nl/news/ai-innovatie-centrum")
+  → Vind: "Directeur AI, Mark de Wit"
+  → save_candidate(name="Mark de Wit", org="Philips", role="Directeur AI", ...)
+
+**Resultaat**: 3 kandidaten gevonden! ✅
+
+## ❌ FOUT (vermijd dit!):
+1. web_search("AI zorg")
+2. Bekijk alleen snippets
+3. Geen fetch_page_content
+4. **Resultaat: 0 kandidaten** ❌
 5. check_previous_guests("Sarah Veldman")
 6. save_candidate met alle details
 
