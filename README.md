@@ -1,6 +1,6 @@
 # Guest Search
 
-[![Tests](https://img.shields.io/badge/tests-181%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-192%20passing-brightgreen)](tests/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -17,7 +17,7 @@ AI-driven podcast guest finder and topic researcher with intelligent search and 
 🎯 **Interactive Selection** - Beautiful terminal UI to review and select guests
 📋 **Trello Integration** - One-click export of guests to Trello boards
 📝 **Rich Markdown Reports** - Beautiful terminal-rendered reports with syntax highlighting
-✅ **Well Tested** - 187 tests covering 11 critical areas (guest finder + topic researcher + learning)
+✅ **Well Tested** - 192 tests covering 11 critical areas (guest finder + topic researcher + learning)
 📊 **Arc42 Documentation** - Complete architecture documentation with Mermaid diagrams
 
 ## Quick Start
