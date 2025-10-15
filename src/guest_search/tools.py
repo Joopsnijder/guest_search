@@ -108,14 +108,8 @@ def get_tools():
                     "relevance_description": {"type": "string"},
                     "sources": {
                         "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "url": {"type": "string"},
-                                "title": {"type": "string"},
-                                "date": {"type": "string"},
-                            },
-                        },
+                        "items": {"type": "string"},
+                        "description": "List of URLs waar deze persoon gevonden is",
                     },
                     "contact_info": {
                         "type": "object",

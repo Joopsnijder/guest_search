@@ -143,10 +143,27 @@ Each person in `potential_persons` contains:
 **Your job**:
 1. Review EACH person in `potential_persons` array
 2. Read their `context` to understand their role
-3. Determine if they're relevant for the podcast
+3. **DEFAULT TO YES**: If the person has ANY connection to AI/tech → save them!
 4. Call `save_candidate` for relevant persons (use the context to fill in organization/role)
 
 ### Stap 4: Sla kandidaten op
+🚨 **SAVE EVERY AI-RELATED PERSON YOU FIND!**
+
+For EACH person in `potential_persons`:
+1. Check `check_previous_guests` to avoid duplicates
+2. If NOT previously recommended → **SAVE IMMEDIATELY** with `save_candidate`:
+   - name: Full name from potential_persons (e.g., "Lukasz Grus")
+   - organization: Extract from context (e.g., "Wageningen University & Research")
+   - role: Extract from context (e.g., "Opleidingsdirecteur Data Science")
+   - topics: ["AI", "data science"] (or more specific if clear from context)
+   - relevance_description: Short sentence from context (e.g., "Leading new Data Science program")
+   - sources: ["https://url-where-found.com"] (simple list of URL strings, not objects!)
+   - contact_info: {{}} (empty object - always use this)
+
+**DEFAULT RULE: When in doubt, SAVE THE PERSON!**
+Better to have more candidates than miss interesting people.
+
+OLD REMOVED RULES - IGNORE:
 Als je een interessante persoon vindt met voldoende informatie:
 1. Gebruik `check_previous_guests` met de naam om duplicaten te voorkomen
 2. Als deze persoon nog niet eerder is aanbevolen, gebruik dan `save_candidate` met:

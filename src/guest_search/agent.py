@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timedelta
 from typing import cast
 
@@ -594,51 +595,92 @@ Er is nog geen historische data beschikbaar.\n"
                 # Learning: Track sources used in this query
                 sources_used = []
 
-                # Agent doet zoekopdracht
-                response = self.client.messages.create(
-                    model=Config.MODEL,
-                    max_tokens=Config.SEARCH_MAX_TOKENS,
-                    tools=cast(list[ToolParam], self.tools),
-                    messages=conversation,
-                )
+                # Multi-turn conversation loop: agent kan meerdere tool calls doen
+                max_turns = 10  # Safety limit
+                turn_count = 0
 
-                # Verwerk response en tool calls (zonder print statements)
-                assistant_message = {"role": "assistant", "content": []}
+                while turn_count < max_turns:
+                    turn_count += 1
 
-                for block in response.content:
-                    if block.type == "text":
-                        assistant_message["content"].append(block)
+                    # Agent doet zoekopdracht (of vervolgactie)
+                    response = self.client.messages.create(
+                        model=Config.MODEL,
+                        max_tokens=Config.SEARCH_MAX_TOKENS,
+                        tools=cast(list[ToolParam], self.tools),
+                        messages=conversation,
+                    )
 
-                    elif block.type == "tool_use":
-                        # Voer tool uit (silent)
-                        result = self._handle_tool_call(block.name, block.input, silent=True)
-
-                        # Learning: Track successful fetch_page_content calls
-                        if block.name == "fetch_page_content" and result.get("status") == "success":
-                            sources_used.append(block.input.get("url", ""))
-
-                        # Voeg tool use en result toe aan conversatie
-                        assistant_message["content"].append(block)
-                        conversation.append(assistant_message)
-                        conversation.append(
-                            {
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "tool_result",
-                                        "tool_use_id": block.id,
-                                        "content": json.dumps(result),
-                                    }
-                                ],
-                            }
+                    # DEBUG: Print stop reason
+                    if os.getenv("DEBUG_TOOLS"):
+                        self.console.print(
+                            f"[dim]Turn {turn_count}, Stop: {response.stop_reason}[/dim]"
                         )
 
-                        # Reset voor volgende iteratie
-                        assistant_message = {"role": "assistant", "content": []}
+                    # Verwerk response en tool calls
+                    assistant_message = {"role": "assistant", "content": []}
+                    has_tool_use = False
 
-                # Voeg laatste assistant message toe als die text bevat
-                if assistant_message["content"]:
-                    conversation.append(assistant_message)
+                    for block in response.content:
+                        if block.type == "text":
+                            assistant_message["content"].append(block)
+
+                        elif block.type == "tool_use":
+                            has_tool_use = True
+
+                            # DEBUG: Print tool calls
+                            if os.getenv("DEBUG_TOOLS"):
+                                self.console.print(f"[dim]🔧 Tool: {block.name}[/dim]")
+
+                            # Voer tool uit (silent)
+                            result = self._handle_tool_call(block.name, block.input, silent=True)
+
+                            # DEBUG: Print results
+                            if os.getenv("DEBUG_TOOLS"):
+                                if block.name == "fetch_page_content":
+                                    self.console.print(
+                                        f"[dim]   → Status: {result.get('status')}, "
+                                        f"Persons: {result.get('persons_found', 0)}[/dim]"
+                                    )
+                                elif block.name == "save_candidate":
+                                    self.console.print(
+                                        f"[dim]   → Saved: {block.input.get('name', 'unknown')}[/dim]"
+                                    )
+
+                            # Learning: Track successful fetch_page_content calls
+                            if (
+                                block.name == "fetch_page_content"
+                                and result.get("status") == "success"
+                            ):
+                                sources_used.append(block.input.get("url", ""))
+
+                            # Voeg tool use en result toe aan conversatie
+                            assistant_message["content"].append(block)
+                            conversation.append(assistant_message)
+                            conversation.append(
+                                {
+                                    "role": "user",
+                                    "content": [
+                                        {
+                                            "type": "tool_result",
+                                            "tool_use_id": block.id,
+                                            "content": json.dumps(result),
+                                        }
+                                    ],
+                                }
+                            )
+
+                            # Reset voor volgende tool call
+                            assistant_message = {"role": "assistant", "content": []}
+
+                    # Voeg laatste assistant message toe als die text bevat
+                    if assistant_message["content"]:
+                        conversation.append(assistant_message)
+
+                    # Stop loop als agent geen tool calls meer doet (klaar met deze query)
+                    if not has_tool_use:
+                        if os.getenv("DEBUG_TOOLS"):
+                            self.console.print("[dim]✓ Agent finished (no more tools)[/dim]")
+                        break
 
                 # Learning: Calculate candidates found by this query
                 candidates_found = len(self.candidates) - candidates_before
