@@ -259,3 +259,50 @@ def test_source_deduplication_in_insights(temp_data_dir, mock_anthropic_client):
     assert len(recent_sources) == 2
     assert any("aic4nl.nl" in s for s in recent_sources)
     assert any("computable.nl" in s for s in recent_sources)
+
+
+def test_strategy_saved_in_session(temp_data_dir, mock_anthropic_client):
+    """Test that planning strategy is saved in session record."""
+    agent = GuestFinderAgent()
+
+    # Simulate a strategy
+    agent.current_session_strategy = {
+        "week_focus": "AI Act implementatie in Nederlandse bedrijven",
+        "sectors_to_prioritize": ["zorg", "overheid"],
+        "topics_to_cover": ["AI Act", "compliance"],
+        "total_queries_planned": 12,
+    }
+
+    # Verify it's stored
+    assert agent.current_session_strategy is not None
+    assert agent.current_session_strategy["week_focus"].startswith("AI Act")
+    assert len(agent.current_session_strategy["sectors_to_prioritize"]) == 2
+
+
+def test_strategy_included_in_insights(temp_data_dir, mock_anthropic_client):
+    """Test that previous strategies are included in learning insights."""
+    agent = GuestFinderAgent()
+
+    now = datetime.now()
+
+    # Create session with strategy
+    agent.search_history["sessions"] = [
+        {
+            "date": now.isoformat(),
+            "total_candidates": 5,
+            "strategy": {
+                "week_focus": "Focus on vakmedia for diverse sources",
+                "sectors_to_prioritize": ["zorg", "agrifood"],
+                "topics_to_cover": ["AI Act", "Green AI"],
+            },
+            "queries": [{"query": "test", "candidates_found": 5, "successful_sources": []}],
+        }
+    ]
+
+    insights = agent._get_learning_insights(weeks=4)
+
+    assert insights is not None
+    assert "previous_strategies" in insights
+    assert len(insights["previous_strategies"]) == 1
+    assert insights["previous_strategies"][0]["week_focus"] == "Focus on vakmedia for diverse sources"
+    assert insights["previous_strategies"][0]["candidates_found"] == 5

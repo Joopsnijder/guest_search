@@ -28,9 +28,10 @@ class GuestFinderAgent:
         self.smart_search = SmartSearchTool(enable_cache=True)
         # Rich console for pretty output
         self.console = Console()
-        # Learning: Track query performance
+        # Learning: Track query performance and strategy
         self.search_history = self._load_search_history()
         self.current_session_queries = []
+        self.current_session_strategy = None
 
     def _load_previous_guests(self):
         """Laad lijst van eerder aanbevolen gasten"""
@@ -132,12 +133,25 @@ class GuestFinderAgent:
         # Top 5 bronnen
         top_sources = sorted(source_stats.items(), key=lambda x: x[1], reverse=True)[:5]
 
+        # Verzamel previous strategies (for reflection)
+        previous_strategies = []
+        for session in recent_sessions:
+            if "strategy" in session and session["strategy"]:
+                previous_strategies.append(
+                    {
+                        "week_focus": session["strategy"].get("week_focus", ""),
+                        "candidates_found": session.get("total_candidates", 0),
+                        "date": session.get("date", ""),
+                    }
+                )
+
         return {
             "total_sessions": len(recent_sessions),
             "total_queries": len(all_queries),
             "successful_queries": len(successful_queries),
             "top_performing_queries": successful_queries[:5],
             "top_sources": [source for source, count in top_sources],
+            "previous_strategies": previous_strategies,  # NEW
             "avg_candidates_per_query": (
                 sum(q.get("candidates_found", 0) for q in all_queries) / len(all_queries)
                 if all_queries
@@ -290,6 +304,24 @@ in {learning_insights['total_sessions']} sessies.
             avg = learning_insights["avg_candidates_per_query"]
             learning_section += f"\n**Gemiddeld**: {avg:.1f} kandidaten per query\n"
 
+            # Add previous strategies (for reflection)
+            if learning_insights.get("previous_strategies"):
+                learning_section += "\n\n📋 **Eerdere strategieën:**\n"
+                for strat in learning_insights["previous_strategies"][:3]:
+                    focus = strat.get("week_focus", "Geen focus opgegeven")[:60]
+                    candidates = strat.get("candidates_found", 0)
+                    learning_section += f"- \"{focus}\" → {candidates} kandidaten\n"
+
+                # Add reflection prompt
+                if avg < 1.0:
+                    learning_section += (
+                        "\n⚠️ **KRITISCH**: Gemiddeld <1 kandidaat per query. "
+                        "Vorige strategieën werkten niet. Overweeg:\n"
+                        "- Andere query types (niet alleen site:)\n"
+                        "- Bredere bronnen (niet alleen vakmedia)\n"
+                        "- Andere zoektermen (meer Nederlands, minder technisch)\n"
+                    )
+
             # Add recently used sources warning
             if recently_used_sources:
                 learning_section += "\n\n⚠️ **Recent gebruikte bronnen** (laatste week):\n"
@@ -393,6 +425,14 @@ Er is nog geen historische data beschikbaar.\n"
             self.console.print(
                 Panel(table, title="[bold green]Strategie Klaar", border_style="green")
             )
+
+            # Learning: Save strategy for this session
+            self.current_session_strategy = {
+                "week_focus": strategy_json.get("week_focus", ""),
+                "sectors_to_prioritize": strategy_json.get("sectors_to_prioritize", []),
+                "topics_to_cover": strategy_json.get("topics_to_cover", []),
+                "total_queries_planned": len(strategy_json.get("search_queries", [])),
+            }
 
             return strategy_json
 
@@ -634,6 +674,7 @@ Er is nog geen historische data beschikbaar.\n"
             "week_number": week_number,
             "total_queries": len(self.current_session_queries),
             "total_candidates": len(self.candidates),
+            "strategy": self.current_session_strategy,  # NEW: Save the planning strategy
             "queries": self.current_session_queries,
         }
         self.search_history["sessions"].append(session_record)
