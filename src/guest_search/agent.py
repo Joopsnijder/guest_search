@@ -216,11 +216,97 @@ class GuestFinderAgent:
                     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
                     text = "\n".join(chunk for chunk in chunks if chunk)
 
-                    # Truncate if too long (max 4000 chars)
+                    # Extract potential person names with context
+                    import re
+
+                    potential_persons = []
+
+                    # Pattern 1: Names with titles (Prof., Dr., etc.)
+                    title_patterns = [
+                        r"(Prof\.?\s+(?:dr\.?\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+                        r"(Dr\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+                        r"(Drs\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+                        r"(Ir\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+                    ]
+
+                    for pattern in title_patterns:
+                        matches = re.finditer(pattern, text)
+                        for match in matches:
+                            full_match = match.group(1)
+                            name = match.group(2) if len(match.groups()) > 1 else match.group(1)
+                            # Get context (50 chars before and after)
+                            start = max(0, match.start() - 50)
+                            end = min(len(text), match.end() + 100)
+                            context = text[start:end].replace("\n", " ")
+                            potential_persons.append(
+                                {"name": name, "title_match": full_match, "context": context}
+                            )
+
+                    # Pattern 2: Names with job titles/roles
+                    role_patterns = [
+                        r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+),?\s+(hoogleraar|professor|docent|onderzoeker|CEO|CTO|directeur|hoofd|lead|manager|wethouder|burgemeester)",
+                        r"(hoogleraar|professor|docent|onderzoeker|CEO|CTO|directeur|hoofd|lead|manager|wethouder|burgemeester)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+                        r"volgens\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+                        r"door\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+),",
+                        r"zegt\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+                        r"vertelt\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+                        r"aldus\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+                    ]
+
+                    for pattern in role_patterns:
+                        matches = re.finditer(pattern, text, re.IGNORECASE)
+                        for match in matches:
+                            # Extract name from match groups
+                            name = None
+                            for group in match.groups():
+                                if (
+                                    group
+                                    and len(group.split()) >= 2
+                                    and group[0].isupper()
+                                    and group.lower() not in [
+                                        "hoogleraar",
+                                        "professor",
+                                        "docent",
+                                        "onderzoeker",
+                                        "ceo",
+                                        "cto",
+                                        "directeur",
+                                        "hoofd",
+                                        "lead",
+                                        "manager",
+                                        "wethouder",
+                                        "burgemeester",
+                                    ]
+                                ):
+                                    name = group
+                                    break
+
+                            if name:
+                                start = max(0, match.start() - 50)
+                                end = min(len(text), match.end() + 100)
+                                context = text[start:end].replace("\n", " ")
+                                potential_persons.append({"name": name, "context": context})
+
+                    # Remove duplicates (same name)
+                    seen_names = set()
+                    unique_persons = []
+                    for person in potential_persons:
+                        name_lower = person["name"].lower()
+                        if name_lower not in seen_names:
+                            seen_names.add(name_lower)
+                            unique_persons.append(person)
+
+                    # Truncate text if too long (max 4000 chars)
                     if len(text) > 4000:
                         text = text[:4000] + "\n\n[...tekst ingekort...]"
 
-                    return {"url": url, "content": text, "status": "success"}
+                    return {
+                        "url": url,
+                        "content": text,
+                        "potential_persons": unique_persons[:10],  # Max 10 to avoid overload
+                        "persons_found": len(unique_persons),
+                        "status": "success",
+                    }
                 else:
                     return {"url": url, "error": f"HTTP {response.status_code}", "status": "error"}
 

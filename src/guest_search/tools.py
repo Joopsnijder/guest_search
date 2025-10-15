@@ -46,15 +46,27 @@ def get_tools():
         },
         {
             "name": "fetch_page_content",
-            "description": """Haal de volledige inhoud van een webpagina op om personen,
-            functies en organisaties te vinden. Gebruik dit voor:
+            "description": """Haal de volledige inhoud van een webpagina op en extraheer automatisch
+            personen met hun context. Gebruik dit voor:
             - Congresprogramma's om sprekers te vinden
             - University pages om onderzoekers te identificeren
             - Persberichten om namen en functies te vinden
-            - LinkedIn profielen om details op te halen
+            - Vakmedia artikelen om experts te extraheren
 
-            De tool geeft een samenvatting van de pagina met focus op personen,
-            hun functies, organisaties en contactinformatie.
+            De tool returnt:
+            - content: De volledige paginatext (max 4000 chars)
+            - potential_persons: Lijst van gedetecteerde personen met context
+            - persons_found: Aantal unieke personen gevonden
+
+            De tool gebruikt patroonherkenning om personen te vinden:
+            - Titels: Prof., Dr., Drs., Ir.
+            - Rollen: hoogleraar, CEO, directeur, wethouder, etc.
+            - Citaten: "volgens [Name]", "zegt [Name]", "vertelt [Name]"
+
+            Elk persoon bevat:
+            - name: De volledige naam
+            - context: 150 karakters rondom de naam voor context
+            - title_match: (optioneel) Als er een titel werd gevonden
             """,
             "input_schema": {
                 "type": "object",

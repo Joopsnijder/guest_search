@@ -128,11 +128,23 @@ fetch_page_content("the-url-here")
 - Full page = HAS NAMES
 - No fetch = 0 candidates (100% failure rate)
 
-On each fetched page, look for:
-- Full names (first + last name)
-- Job titles (Dr., Prof., CEO, CTO, Lead, etc.)
-- Organizations
-- Why this person is relevant NOW
+**🎯 NEW: Automatic Name Extraction!**
+The tool now AUTOMATICALLY extracts person names for you!
+
+Check the response for:
+- `potential_persons`: List of detected persons with their context
+- `persons_found`: Total number of unique persons found
+
+Each person in `potential_persons` contains:
+- `name`: Full name (e.g., "Lukasz Grus")
+- `context`: 150 chars around the name showing role/organization
+- `title_match`: (if applicable) Academic or professional title
+
+**Your job**:
+1. Review EACH person in `potential_persons` array
+2. Read their `context` to understand their role
+3. Determine if they're relevant for the podcast
+4. Call `save_candidate` for relevant persons (use the context to fill in organization/role)
 
 ### Stap 4: Sla kandidaten op
 Als je een interessante persoon vindt met voldoende informatie:
