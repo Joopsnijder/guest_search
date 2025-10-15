@@ -715,13 +715,16 @@ Er is nog geen historische data beschikbaar.\n"
 
         week_number = datetime.now().isocalendar()[1]
 
-        # Haal recent aanbevolen gasten op (laatste 2 weken)
-        recent_guests = self._get_recent_guests(weeks=2)
-
-        # Als er geen nieuwe kandidaten zijn, maar wel recente gasten, maak dan toch een rapport
-        if not self.candidates and not recent_guests:
-            print("⚠️  Geen kandidaten gevonden en geen recente gasten")
+        # Als er geen nieuwe kandidaten zijn, skip rapport generatie
+        if not self.candidates:
+            self.console.print()
+            self.console.print(
+                "[yellow]⚠️  Geen nieuwe kandidaten gevonden - rapport wordt overgeslagen[/yellow]"
+            )
             return "Geen nieuwe kandidaten deze week."
+
+        # Haal recent aanbevolen gasten op (laatste 2 weken) voor context
+        recent_guests = self._get_recent_guests(weeks=2)
 
         self.console.print()
         self.console.print(
