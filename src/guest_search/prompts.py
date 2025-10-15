@@ -78,15 +78,25 @@ SEARCH_EXECUTION_PROMPT = """Je voert nu de zoekstrategie uit die je hebt bedach
 Query: {current_query}
 Rationale: {query_rationale}
 
-## Instructies
+## ⚠️ CRITICAL: Snippets NEVER contain names!
 
-### Stap 1: Zoek met web_search
-Voer de `web_search` tool uit met de gegeven query.
+**YOU MUST:**
+1. Call `web_search` → get URLs
+2. Call `fetch_page_content` on 2-3 URLs → get names
+3. Call `save_candidate` for each name found
 
-### Stap 2: Analyseer de zoekresultaten
-**KRITISCH**: Snippets bevatten NOOIT namen - je MOET URLs fetchen!
+**IF YOU SKIP fetch_page_content:**
+→ You will find ZERO candidates (guaranteed failure)
 
-Zoek in de snippets naar URLs die waarschijnlijk personen bevatten:
+---
+
+## 🚨 MANDATORY WORKFLOW - FOLLOW EXACTLY:
+
+### Stap 1: web_search
+Voer `web_search` uit met de gegeven query.
+
+### Stap 2: SELECT URLs (kies minimaal 2-3 URLs)
+**STOP!** Lees de snippets en selecteer URLs die lijken te bevatten:
 
 **Prioriteit 1 - Vakmedia artikelen** (beste bron):
 - AG Connect, Computable, Emerce artikelen met interviews
@@ -104,17 +114,25 @@ Zoek in de snippets naar URLs die waarschijnlijk personen bevatten:
 
 **VERMIJD**: Conferentie speaker lists (vaak al gebruikt)
 
-### Stap 3: Fetch ALLE relevante URLs (VERPLICHT!)
-**CRITICAL**: Voor ELKE URL die lijkt te verwijzen naar een artikel, persbericht, of project:
+### Stap 3: fetch_page_content (DO THIS NOW!)
+**🚨 MOST IMPORTANT STEP - DO NOT SKIP!**
 
-1. **Je MOET `fetch_page_content` gebruiken** - snippets zijn ONBRUIKBAAR voor namen
-2. Selecteer minimaal 2-3 URLs per web_search resultaat
-3. Zoek op de gefetchte pagina naar:
-   - Volledige namen (voornaam + achternaam)
-   - Functietitels (Dr., Prof., CEO, CTO, Lead, etc.)
-   - Organisaties
-   - Waarom deze persoon relevant is
-4. **VARIEER je bronnen** - niet alle kandidaten van dezelfde website
+For EACH of the 2-3 URLs you selected:
+
+```
+fetch_page_content("the-url-here")
+```
+
+**WHY THIS IS MANDATORY:**
+- Snippets = NO NAMES (ever!)
+- Full page = HAS NAMES
+- No fetch = 0 candidates (100% failure rate)
+
+On each fetched page, look for:
+- Full names (first + last name)
+- Job titles (Dr., Prof., CEO, CTO, Lead, etc.)
+- Organizations
+- Why this person is relevant NOW
 
 ### Stap 4: Sla kandidaten op
 Als je een interessante persoon vindt met voldoende informatie:
