@@ -99,14 +99,13 @@ class TrelloManager:
             description_parts.append(f"**{organization}**\n")
 
         # === MAIN CONTENT: Relevance and Topics ===
-        # Relevance (why interesting)
+        # Relevance (why interesting) - prefer enriched description over why_now
         if "relevance_description" in guest and guest["relevance_description"]:
             description_parts.append("**Waarom interessant:**")
             description_parts.append(guest["relevance_description"])
             description_parts.append("")
-
-        # Why now (for recent guests)
-        if "why_now" in guest and guest["why_now"]:
+        elif "why_now" in guest and guest["why_now"]:
+            # Fallback to why_now only if no relevance_description
             description_parts.append("**Context:**")
             description_parts.append(guest["why_now"])
             description_parts.append("")

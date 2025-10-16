@@ -1,0 +1,552 @@
+[
+  {
+    "name": "Ylja Remmits",
+    "date": "2025-10-12T11:34:37.807174",
+    "organization": "Stichting Algorithm Audit"
+  },
+  {
+    "name": "Jeroen Bleker",
+    "date": "2025-10-12T11:34:37.807181",
+    "organization": "Alten Netherlands"
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-12T11:38:56.474658",
+    "organization": "Tilburg University",
+    "role": "Professor",
+    "why_now": "Keynote spreker op AI Act Implementatie Congres november 2025, expert in AI-regelgeving en privacyrecht",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementatie Congres: Van onduidelijkheid naar daadkracht",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Alexander van Someren",
+    "date": "2025-10-12T11:38:56.474702",
+    "organization": "LUMC",
+    "role": "AI specialist",
+    "why_now": "Panellid op AI Act Implementatie Congres november 2025, expert in AI mapping voor zorgsector",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementatie Congres: Van onduidelijkheid naar daadkracht",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Jessica Workum",
+    "date": "2025-10-12T11:38:56.474719",
+    "organization": "Elisabeth-TweeSteden Ziekenhuis",
+    "role": "Intensivist en AI-specialist",
+    "why_now": "Panellid op AI Act Implementatie Congres november 2025, expert in hoogrisico AI-systemen in de zorg",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementatie Congres: Van onduidelijkheid naar daadkracht",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Arjan Spaans",
+    "date": "2025-10-12T11:38:56.474730",
+    "organization": "Gemeente Zwolle",
+    "role": "Wethouder",
+    "why_now": "Panellid op AI Act Implementatie Congres november 2025, expert in AI compliance voor overheidssector",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementatie Congres: Van onduidelijkheid naar daadkracht",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Tim den Uyl",
+    "date": "2025-10-12T11:43:37.130736",
+    "organization": "VicarVision",
+    "role": "CEO",
+    "why_now": "CEO van VicarVision, spreekt op AI Act Implementatie Congres over hoog-risico AI-systemen. VicarVision's FaceReader wordt als verboden/hoog-risico toepassing behandeld onder de AI Act, waardoor hij unieke praktijkervaring heeft met AI Act compliance voor computer vision toepassingen.",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementatie Congres: Van onduidelijkheid naar daadkracht",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Nicole Onuta",
+    "date": "2025-10-12T11:43:37.130749",
+    "organization": "ING",
+    "role": "Lead AI Risk Management",
+    "why_now": "Lead AI Risk Management bij ING, spreekt op AI in Banking Conference 2025. Heeft directe ervaring met implementatie van AI risk management frameworks in een van de grootste Nederlandse banken, zeer relevant voor fintech en AI governance discussies.",
+    "sources": [
+      {
+        "url": "https://outvie.nl/conferenties/ai-in-banking/",
+        "title": "AI in Banking Conference | October 7th, 2025",
+        "date": "2025-10-07"
+      }
+    ]
+  },
+  {
+    "name": "Michele Fumarola",
+    "date": "2025-10-12T11:59:16.334141",
+    "organization": "Knowledge Institute",
+    "role": "AI officer",
+    "why_now": "AI officer die expertise heeft in AI literacy en organisatiecultuur. Spreekt op het AI Act Implementation Congress over hoe je werknemers AI laat begrijpen - zeer relevant voor bedrijven die AI willen implementeren.",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/en/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementation Congress: From ambiguity to decisiveness",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Martijn Doornbos",
+    "date": "2025-10-12T12:20:30.626995",
+    "organization": "LegalMike",
+    "role": "Founder/CEO",
+    "why_now": "Spreker op AI Act Implementation Congress over GPAI code of practice en ChatGPT-gebaseerde AI tools. Relevant voor praktische implementatie van AI Act voor gebruikers van generative AI tools.",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/en/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementation Congress: From ambiguity to decisiveness",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Rob Elsinga",
+    "date": "2025-10-12T12:20:30.627008",
+    "organization": "Microsoft Netherlands",
+    "role": "AI Specialist/Manager",
+    "why_now": "Spreker op AI Act Implementation Congress over GPAI code of practice vanuit Microsoft perspectief. Relevant voor enterprise AI implementatie en grote taalmodellen.",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/en/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementation Congress: From ambiguity to decisiveness",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Noëlle Cicilia",
+    "date": "2025-10-12T12:20:30.627014",
+    "organization": "Brush.ai",
+    "role": "AI Ethics Specialist",
+    "why_now": "Spreker op AI Act Implementation Congress over AI compliance in de praktijk en AI ethics. Expert in verantwoorde AI-implementatie en praktische compliance tools.",
+    "sources": [
+      {
+        "url": "https://aic4nl.nl/en/evenement/ai-act-implementatie-congres/",
+        "title": "AI Act Implementation Congress: From ambiguity to decisiveness",
+        "date": "2025-11-11"
+      }
+    ]
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-15T18:55:01.233599",
+    "organization": "Tilburg University",
+    "role": "Professor Global ICT Law",
+    "why_now": "Expert op het gebied van technologierecht en privacy, spreker op Het Nederlandse AI-Congres 2025 over AI regelgeving en ethiek",
+    "sources": []
+  },
+  {
+    "name": "Maarten Stolk",
+    "date": "2025-10-15T18:55:01.233619",
+    "organization": "Deeploy",
+    "role": "CEO",
+    "why_now": "CEO van Deeploy, aan de frontlinie van transparante en verantwoordelijke AI-toepassingen, spreker op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Erik Huizer",
+    "date": "2025-10-15T18:55:01.233627",
+    "organization": "GÉANT (voormalig), Universiteit Twente",
+    "role": "Voormalig CEO GÉANT, parttime hoogleraar",
+    "why_now": "Voormalig CEO van GÉANT Europa's onderzoeksnetwerk, nu parttime hoogleraar Universiteit Twente, expert in panel 'Industrie' op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Jarno Duursma",
+    "date": "2025-10-15T18:55:01.233633",
+    "organization": "Onafhankelijk AI-expert",
+    "role": "AI-spreker en expert",
+    "why_now": "Dé AI-spreker van Nederland, keynote spreker op AI & Talent event oktober 2025, expert in praktische AI-impact op organisaties",
+    "sources": []
+  },
+  {
+    "name": "Frank Verduijn",
+    "date": "2025-10-15T18:55:01.233637",
+    "organization": "UWV",
+    "role": "Hoofdonderzoeker AI arbeidsmarkt",
+    "why_now": "Hoofdonderzoeker bij UWV met actuele data over hoe AI het werkveld en taken in Nederland nu al verandert, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Caroline Tervoort-Visser",
+    "date": "2025-10-15T18:55:01.233642",
+    "organization": "KPMG",
+    "role": "CHRO",
+    "why_now": "CHRO bij KPMG, toont hoe AI en menselijke innovatie verbindend ingezet kunnen worden om organisaties te versterken, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Maarten Renkema",
+    "date": "2025-10-15T18:55:01.233646",
+    "organization": "University of Twente",
+    "role": "Assistant Professor HRM, Technology and Innovation",
+    "why_now": "Assistant Professor aan University of Twente, expert in employee-driven innovation en technologie in HRM, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Geert-Jan Waasdorp",
+    "date": "2025-10-15T18:55:01.233649",
+    "organization": "Intelligence Group",
+    "role": "Founder",
+    "why_now": "Founder van Intelligence Group, geeft workshop over AI-toepassingen in recruitment en HR op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-16T12:02:15.847656",
+    "organization": "Tilburg University",
+    "role": "Professor Global ICT Law",
+    "why_now": "Expert op het gebied van technologierecht en privacy, spreker op Het Nederlandse AI-Congres 2025 over AI regelgeving en ethiek",
+    "sources": []
+  },
+  {
+    "name": "Maarten Stolk",
+    "date": "2025-10-16T12:02:15.847672",
+    "organization": "Deeploy",
+    "role": "CEO",
+    "why_now": "CEO van Deeploy, aan de frontlinie van transparante en verantwoordelijke AI-toepassingen, spreker op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Erik Huizer",
+    "date": "2025-10-16T12:02:15.847680",
+    "organization": "GÉANT (voormalig), Universiteit Twente",
+    "role": "Voormalig CEO GÉANT, parttime hoogleraar",
+    "why_now": "Voormalig CEO van GÉANT Europa's onderzoeksnetwerk, nu parttime hoogleraar Universiteit Twente, expert in panel 'Industrie' op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Jarno Duursma",
+    "date": "2025-10-16T12:02:15.847687",
+    "organization": "Onafhankelijk AI-expert",
+    "role": "AI-spreker en expert",
+    "why_now": "Dé AI-spreker van Nederland, keynote spreker op AI & Talent event oktober 2025, expert in praktische AI-impact op organisaties",
+    "sources": []
+  },
+  {
+    "name": "Frank Verduijn",
+    "date": "2025-10-16T12:02:15.847691",
+    "organization": "UWV",
+    "role": "Hoofdonderzoeker AI arbeidsmarkt",
+    "why_now": "Hoofdonderzoeker bij UWV met actuele data over hoe AI het werkveld en taken in Nederland nu al verandert, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Caroline Tervoort-Visser",
+    "date": "2025-10-16T12:02:15.847695",
+    "organization": "KPMG",
+    "role": "CHRO",
+    "why_now": "CHRO bij KPMG, toont hoe AI en menselijke innovatie verbindend ingezet kunnen worden om organisaties te versterken, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Maarten Renkema",
+    "date": "2025-10-16T12:02:15.847700",
+    "organization": "University of Twente",
+    "role": "Assistant Professor HRM, Technology and Innovation",
+    "why_now": "Assistant Professor aan University of Twente, expert in employee-driven innovation en technologie in HRM, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Geert-Jan Waasdorp",
+    "date": "2025-10-16T12:02:15.847704",
+    "organization": "Intelligence Group",
+    "role": "Founder",
+    "why_now": "Founder van Intelligence Group, geeft workshop over AI-toepassingen in recruitment en HR op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-16T12:03:34.899891",
+    "organization": "Tilburg University",
+    "role": "Professor Global ICT Law",
+    "why_now": "Expert op het gebied van technologierecht en privacy, spreker op Het Nederlandse AI-Congres 2025 over AI regelgeving en ethiek",
+    "sources": []
+  },
+  {
+    "name": "Maarten Stolk",
+    "date": "2025-10-16T12:03:34.899898",
+    "organization": "Deeploy",
+    "role": "CEO",
+    "why_now": "CEO van Deeploy, aan de frontlinie van transparante en verantwoordelijke AI-toepassingen, spreker op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Erik Huizer",
+    "date": "2025-10-16T12:03:34.899903",
+    "organization": "GÉANT (voormalig), Universiteit Twente",
+    "role": "Voormalig CEO GÉANT, parttime hoogleraar",
+    "why_now": "Voormalig CEO van GÉANT Europa's onderzoeksnetwerk, nu parttime hoogleraar Universiteit Twente, expert in panel 'Industrie' op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Jarno Duursma",
+    "date": "2025-10-16T12:03:34.899908",
+    "organization": "Onafhankelijk AI-expert",
+    "role": "AI-spreker en expert",
+    "why_now": "Dé AI-spreker van Nederland, keynote spreker op AI & Talent event oktober 2025, expert in praktische AI-impact op organisaties",
+    "sources": []
+  },
+  {
+    "name": "Frank Verduijn",
+    "date": "2025-10-16T12:03:34.899910",
+    "organization": "UWV",
+    "role": "Hoofdonderzoeker AI arbeidsmarkt",
+    "why_now": "Hoofdonderzoeker bij UWV met actuele data over hoe AI het werkveld en taken in Nederland nu al verandert, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Caroline Tervoort-Visser",
+    "date": "2025-10-16T12:03:34.899912",
+    "organization": "KPMG",
+    "role": "CHRO",
+    "why_now": "CHRO bij KPMG, toont hoe AI en menselijke innovatie verbindend ingezet kunnen worden om organisaties te versterken, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Maarten Renkema",
+    "date": "2025-10-16T12:03:34.899916",
+    "organization": "University of Twente",
+    "role": "Assistant Professor HRM, Technology and Innovation",
+    "why_now": "Assistant Professor aan University of Twente, expert in employee-driven innovation en technologie in HRM, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Geert-Jan Waasdorp",
+    "date": "2025-10-16T12:03:34.899917",
+    "organization": "Intelligence Group",
+    "role": "Founder",
+    "why_now": "Founder van Intelligence Group, geeft workshop over AI-toepassingen in recruitment en HR op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-16T12:04:41.975514",
+    "organization": "Tilburg University",
+    "role": "Professor Global ICT Law",
+    "why_now": "Expert op het gebied van technologierecht en privacy, spreker op Het Nederlandse AI-Congres 2025 over AI regelgeving en ethiek",
+    "sources": []
+  },
+  {
+    "name": "Maarten Stolk",
+    "date": "2025-10-16T12:04:41.975530",
+    "organization": "Deeploy",
+    "role": "CEO",
+    "why_now": "CEO van Deeploy, aan de frontlinie van transparante en verantwoordelijke AI-toepassingen, spreker op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Erik Huizer",
+    "date": "2025-10-16T12:04:41.975538",
+    "organization": "GÉANT (voormalig), Universiteit Twente",
+    "role": "Voormalig CEO GÉANT, parttime hoogleraar",
+    "why_now": "Voormalig CEO van GÉANT Europa's onderzoeksnetwerk, nu parttime hoogleraar Universiteit Twente, expert in panel 'Industrie' op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Jarno Duursma",
+    "date": "2025-10-16T12:04:41.975546",
+    "organization": "Onafhankelijk AI-expert",
+    "role": "AI-spreker en expert",
+    "why_now": "Dé AI-spreker van Nederland, keynote spreker op AI & Talent event oktober 2025, expert in praktische AI-impact op organisaties",
+    "sources": []
+  },
+  {
+    "name": "Frank Verduijn",
+    "date": "2025-10-16T12:04:41.975548",
+    "organization": "UWV",
+    "role": "Hoofdonderzoeker AI arbeidsmarkt",
+    "why_now": "Hoofdonderzoeker bij UWV met actuele data over hoe AI het werkveld en taken in Nederland nu al verandert, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Caroline Tervoort-Visser",
+    "date": "2025-10-16T12:04:41.975554",
+    "organization": "KPMG",
+    "role": "CHRO",
+    "why_now": "CHRO bij KPMG, toont hoe AI en menselijke innovatie verbindend ingezet kunnen worden om organisaties te versterken, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Maarten Renkema",
+    "date": "2025-10-16T12:04:41.975560",
+    "organization": "University of Twente",
+    "role": "Assistant Professor HRM, Technology and Innovation",
+    "why_now": "Assistant Professor aan University of Twente, expert in employee-driven innovation en technologie in HRM, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Geert-Jan Waasdorp",
+    "date": "2025-10-16T12:04:41.975562",
+    "organization": "Intelligence Group",
+    "role": "Founder",
+    "why_now": "Founder van Intelligence Group, geeft workshop over AI-toepassingen in recruitment en HR op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-16T12:06:04.277056",
+    "organization": "Tilburg University",
+    "role": "Professor Global ICT Law",
+    "why_now": "Expert op het gebied van technologierecht en privacy, spreker op Het Nederlandse AI-Congres 2025 over AI regelgeving en ethiek",
+    "sources": []
+  },
+  {
+    "name": "Maarten Stolk",
+    "date": "2025-10-16T12:06:04.277069",
+    "organization": "Deeploy",
+    "role": "CEO",
+    "why_now": "CEO van Deeploy, aan de frontlinie van transparante en verantwoordelijke AI-toepassingen, spreker op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Erik Huizer",
+    "date": "2025-10-16T12:06:04.277077",
+    "organization": "GÉANT (voormalig), Universiteit Twente",
+    "role": "Voormalig CEO GÉANT, parttime hoogleraar",
+    "why_now": "Voormalig CEO van GÉANT Europa's onderzoeksnetwerk, nu parttime hoogleraar Universiteit Twente, expert in panel 'Industrie' op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Jarno Duursma",
+    "date": "2025-10-16T12:06:04.277083",
+    "organization": "Onafhankelijk AI-expert",
+    "role": "AI-spreker en expert",
+    "why_now": "Dé AI-spreker van Nederland, keynote spreker op AI & Talent event oktober 2025, expert in praktische AI-impact op organisaties",
+    "sources": []
+  },
+  {
+    "name": "Frank Verduijn",
+    "date": "2025-10-16T12:06:04.277086",
+    "organization": "UWV",
+    "role": "Hoofdonderzoeker AI arbeidsmarkt",
+    "why_now": "Hoofdonderzoeker bij UWV met actuele data over hoe AI het werkveld en taken in Nederland nu al verandert, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Caroline Tervoort-Visser",
+    "date": "2025-10-16T12:06:04.277089",
+    "organization": "KPMG",
+    "role": "CHRO",
+    "why_now": "CHRO bij KPMG, toont hoe AI en menselijke innovatie verbindend ingezet kunnen worden om organisaties te versterken, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Maarten Renkema",
+    "date": "2025-10-16T12:06:04.277094",
+    "organization": "University of Twente",
+    "role": "Assistant Professor HRM, Technology and Innovation",
+    "why_now": "Assistant Professor aan University of Twente, expert in employee-driven innovation en technologie in HRM, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Geert-Jan Waasdorp",
+    "date": "2025-10-16T12:06:04.277097",
+    "organization": "Intelligence Group",
+    "role": "Founder",
+    "why_now": "Founder van Intelligence Group, geeft workshop over AI-toepassingen in recruitment en HR op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-16T12:07:01.485842",
+    "organization": "Tilburg University",
+    "role": "Professor Global ICT Law",
+    "why_now": "Expert op het gebied van technologierecht en privacy, spreker op Het Nederlandse AI-Congres 2025 over AI regelgeving en ethiek",
+    "sources": []
+  },
+  {
+    "name": "Maarten Stolk",
+    "date": "2025-10-16T12:07:01.485855",
+    "organization": "Deeploy",
+    "role": "CEO",
+    "why_now": "CEO van Deeploy, aan de frontlinie van transparante en verantwoordelijke AI-toepassingen, spreker op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Erik Huizer",
+    "date": "2025-10-16T12:07:01.485861",
+    "organization": "GÉANT (voormalig), Universiteit Twente",
+    "role": "Voormalig CEO GÉANT, parttime hoogleraar",
+    "why_now": "Voormalig CEO van GÉANT Europa's onderzoeksnetwerk, nu parttime hoogleraar Universiteit Twente, expert in panel 'Industrie' op Het Nederlandse AI-Congres 2025",
+    "sources": []
+  },
+  {
+    "name": "Jarno Duursma",
+    "date": "2025-10-16T12:07:01.485869",
+    "organization": "Onafhankelijk AI-expert",
+    "role": "AI-spreker en expert",
+    "why_now": "Dé AI-spreker van Nederland, keynote spreker op AI & Talent event oktober 2025, expert in praktische AI-impact op organisaties",
+    "sources": []
+  },
+  {
+    "name": "Frank Verduijn",
+    "date": "2025-10-16T12:07:01.485871",
+    "organization": "UWV",
+    "role": "Hoofdonderzoeker AI arbeidsmarkt",
+    "why_now": "Hoofdonderzoeker bij UWV met actuele data over hoe AI het werkveld en taken in Nederland nu al verandert, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Caroline Tervoort-Visser",
+    "date": "2025-10-16T12:07:01.485875",
+    "organization": "KPMG",
+    "role": "CHRO",
+    "why_now": "CHRO bij KPMG, toont hoe AI en menselijke innovatie verbindend ingezet kunnen worden om organisaties te versterken, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Maarten Renkema",
+    "date": "2025-10-16T12:07:01.485882",
+    "organization": "University of Twente",
+    "role": "Assistant Professor HRM, Technology and Innovation",
+    "why_now": "Assistant Professor aan University of Twente, expert in employee-driven innovation en technologie in HRM, spreker op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Geert-Jan Waasdorp",
+    "date": "2025-10-16T12:07:01.485884",
+    "organization": "Intelligence Group",
+    "role": "Founder",
+    "why_now": "Founder van Intelligence Group, geeft workshop over AI-toepassingen in recruitment en HR op AI & Talent event oktober 2025",
+    "sources": []
+  },
+  {
+    "name": "Lokke Moerel",
+    "date": "2025-10-16T12:22:42.507871",
+    "organization": "Tilburg University",
+    "role": "Professor Global ICT Law",
+    "why_now": "Lokke Moerel is Professor Global ICT Law aan Tilburg University en een toonaangevende expert op het gebied van technologierecht en privacy. Ze spreekt op Het Nederlandse AI-Congres 2025 over AI-regelgeving en ethiek, met focus op de praktische toepassing van nieuwe wetgeving. Haar expertise ligt op het snijvlak van juridische compliance en ethische AI-ontwikkeling, wat haar bijzonder relevant maakt voor organisaties die worstelen met de implementatie van de AI Act. Als spreker combineert ze diepgaande juridische kennis met praktische handvatten voor bedrijven.",
+    "sources": []
+  },
+  {
+    "name": "Maarten Stolk",
+    "date": "2025-10-16T12:22:42.507897",
+    "organization": "Deeploy",
+    "role": "CEO",
+    "why_now": "Maarten Stolk is CEO van Deeploy, een bedrijf gespecialiseerd in transparante en verantwoorde AI-implementaties. Hij staat aan de frontlinie van organisaties die AI-systemen daadwerkelijk in productie brengen en daarbij moeten voldoen aan steeds strengere eisen rond transparantie en verantwoordelijkheid. Als spreker op Het Nederlandse AI-Congres 2025 deelt hij praktijkervaringen met het bouwen van AI-systemen die zowel technisch goed functioneren als voldoen aan compliance-eisen. Zijn perspectief is waardevol voor organisaties die van proof-of-concept naar productie-AI willen gaan.",
+    "sources": []
+  }
+]
