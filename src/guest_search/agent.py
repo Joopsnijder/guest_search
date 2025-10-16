@@ -70,6 +70,22 @@ class GuestFinderAgent:
 
         return recent_guests
 
+    def _handle_enrich_candidate(self, tool_input: dict) -> str:
+        """Handle enrich_candidate tool call to update candidate with enriched data."""
+        name = tool_input.get("name", "")
+        enriched_topics = tool_input.get("enriched_topics", [])
+        enriched_relevance = tool_input.get("enriched_relevance", "")
+
+        # Find candidate by name
+        for candidate in self.candidates:
+            if candidate["name"] == name:
+                # Update with enriched data
+                candidate["topics"] = enriched_topics
+                candidate["relevance_description"] = enriched_relevance
+                return f"✓ Kandidaat '{name}' verrijkt met {len(enriched_topics)} topics"
+
+        return f"⚠️ Kandidaat '{name}' niet gevonden"
+
     def _load_search_history(self):
         """Laad search history voor learning"""
         try:
@@ -269,7 +285,8 @@ class GuestFinderAgent:
                                     group
                                     and len(group.split()) >= 2
                                     and group[0].isupper()
-                                    and group.lower() not in [
+                                    and group.lower()
+                                    not in [
                                         "hoogleraar",
                                         "professor",
                                         "docent",
@@ -377,8 +394,8 @@ class GuestFinderAgent:
         if learning_insights and learning_insights["total_sessions"] > 0:
             learning_section = f"""## 🎓 Leergeschiedenis (laatste 4 weken)
 
-Je hebt de afgelopen 4 weken {learning_insights['total_queries']} zoekopdrachten uitgevoerd \
-in {learning_insights['total_sessions']} sessies.
+Je hebt de afgelopen 4 weken {learning_insights["total_queries"]} zoekopdrachten uitgevoerd \
+in {learning_insights["total_sessions"]} sessies.
 
 **Succesvol gebleken queries** (vonden meeste kandidaten):
 """
@@ -402,7 +419,7 @@ in {learning_insights['total_sessions']} sessies.
                 for strat in learning_insights["previous_strategies"][:3]:
                     focus = strat.get("week_focus", "Geen focus opgegeven")[:60]
                     candidates = strat.get("candidates_found", 0)
-                    learning_section += f"- \"{focus}\" → {candidates} kandidaten\n"
+                    learning_section += f'- "{focus}" → {candidates} kandidaten\n'
 
                 # Add reflection prompt
                 if avg < 1.0:
@@ -425,8 +442,7 @@ in {learning_insights['total_sessions']} sessies.
                     domain = source.split("/")[2] if "/" in source else source
                     learning_section += f"- {domain}\n"
                 learning_section += (
-                    "\n**Zoek bij voorkeur naar NIEUWE bronnen** "
-                    "om duplicaten te voorkomen.\n"
+                    "\n**Zoek bij voorkeur naar NIEUWE bronnen** om duplicaten te voorkomen.\n"
                 )
         else:
             learning_section = "## 🎓 Leergeschiedenis\n\nDit is je eerste zoeksessie. \
@@ -599,20 +615,19 @@ Er is nog geen historische data beschikbaar.\n"
                 # Cache TTL is 5 minutes - perfect for 8-12 query sessions
                 if Config.ENABLE_PROMPT_CACHING:
                     # Use structured content with cache_control marker
-                    conversation.append({
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": SEARCH_EXECUTION_PROMPT_CACHEABLE,
-                                "cache_control": {"type": "ephemeral"}
-                            },
-                            {
-                                "type": "text",
-                                "text": dynamic_prompt
-                            }
-                        ]
-                    })
+                    conversation.append(
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": SEARCH_EXECUTION_PROMPT_CACHEABLE,
+                                    "cache_control": {"type": "ephemeral"},
+                                },
+                                {"type": "text", "text": dynamic_prompt},
+                            ],
+                        }
+                    )
                 else:
                     # Legacy mode: combine prompts into single string
                     combined_prompt = SEARCH_EXECUTION_PROMPT_CACHEABLE + "\n\n" + dynamic_prompt
@@ -668,9 +683,9 @@ Er is nog geen historische data beschikbaar.\n"
                                         f"Persons: {result.get('persons_found', 0)}[/dim]"
                                     )
                                 elif block.name == "save_candidate":
-                                    self.console.print(
-                                        f"[dim]   → Saved: {block.input.get('name', 'unknown')}[/dim]"
-                                    )
+                                    # block.input is a dict at runtime
+                                    name = block.input.get("name", "unknown")  # type: ignore
+                                    self.console.print(f"[dim]   → Saved: {name}[/dim]")
 
                             # Learning: Track successful fetch_page_content calls
                             if (
@@ -761,6 +776,44 @@ Er is nog geen historische data beschikbaar.\n"
             )
         )
 
+        # Define enrich_candidate tool for capturing enriched data
+        enrich_tool = {
+            "name": "enrich_candidate",
+            "description": (
+                "Sla verrijkte kandidaat informatie op met uitgebreide topics "
+                "en relevance description"
+            ),
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": (
+                            "Volledige naam van de kandidaat "
+                            "(moet exact matchen met bestaande kandidaat)"
+                        ),
+                    },
+                    "enriched_topics": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": (
+                            "4-5 specifieke, concrete onderwerpen "
+                            "(bijv. 'Cijfers over AI-impact op banen in Nederland' "
+                            "niet alleen 'AI')"
+                        ),
+                    },
+                    "enriched_relevance": {
+                        "type": "string",
+                        "description": (
+                            "Uitgebreide relevance description van 3-5 zinnen die "
+                            "feitelijk beschrijft wat deze persoon doet en waarom relevant"
+                        ),
+                    },
+                },
+                "required": ["name", "enriched_topics", "enriched_relevance"],
+            },
+        }
+
         prompt = REPORT_GENERATION_PROMPT.format(
             candidates_json=json.dumps(self.candidates, indent=2, ensure_ascii=False),
             recent_guests_json=json.dumps(recent_guests, indent=2, ensure_ascii=False),
@@ -769,19 +822,56 @@ Er is nog geen historische data beschikbaar.\n"
             has_recent_guests=len(recent_guests) > 0,
         )
 
-        with self.console.status("[cyan]Agent schrijft rapport...[/cyan]"):
-            response = self.client.messages.create(
-                model=Config.MODEL,
-                max_tokens=Config.SEARCH_MAX_TOKENS,
-                messages=[{"role": "user", "content": prompt}],
-            )
+        # Use multi-turn conversation to handle tool calls and report generation
+        conversation: list = [{"role": "user", "content": prompt}]
+        report = None
 
-        # Extract text from first content block
-        first_block = response.content[0]
-        if first_block.type == "text":
-            report = first_block.text
-        else:
-            report = "Error: Unexpected response type"
+        status_msg = "[cyan]Agent verrijkt kandidaten en schrijft rapport...[/cyan]"
+        with self.console.status(status_msg):
+            # Max 10 turns (enough for enriching all candidates + report)
+            for _ in range(10):
+                response = self.client.messages.create(
+                    model=Config.MODEL,
+                    max_tokens=Config.SEARCH_MAX_TOKENS,
+                    messages=conversation,  # type: ignore
+                    tools=[enrich_tool],  # type: ignore
+                )
+
+                # Check stop reason
+                if response.stop_reason == "tool_use":
+                    # Process tool calls
+                    tool_results = []
+                    for block in response.content:
+                        if block.type == "tool_use":
+                            if block.name == "enrich_candidate":
+                                # Convert tool input to dict
+                                tool_input = dict(block.input) if block.input else {}
+                                result = self._handle_enrich_candidate(tool_input)
+                                tool_results.append(
+                                    {
+                                        "type": "tool_result",
+                                        "tool_use_id": block.id,
+                                        "content": result,
+                                    }
+                                )
+
+                    # Add assistant message and tool results to conversation
+                    conversation.append({"role": "assistant", "content": response.content})
+                    conversation.append({"role": "user", "content": tool_results})
+
+                elif response.stop_reason == "end_turn":
+                    # Extract text from response
+                    for block in response.content:
+                        if block.type == "text":
+                            report = block.text
+                            break
+                    break
+                else:
+                    # Unexpected stop reason
+                    break
+
+        if not report:
+            report = "Error: Kon geen rapport genereren"
 
         # Bewaar rapport
         filename = f"output/reports/week_{week_number}_{datetime.now().strftime('%Y%m%d')}.md"

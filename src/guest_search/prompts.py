@@ -11,8 +11,10 @@ Dag van de week: {day_of_week}
 Analyseer de situatie en maak een zoekstrategie voor deze week. Denk na over:
 
 1. **Actuele AI-thema's**: Welke AI-onderwerpen zijn deze week actueel in Nederland?
-2. **Sectorbalans**: Welke sectoren zijn onderbelicht? (zorg, energie, overheid, agrifood, finance, industrie, retail, onderwijs)
-3. **Diverse onderwerpen**: Zoek spreiding over Explainable AI, Green AI, MLOps/LLMOps, AI-ethiek, AI-Act, praktijkcases
+2. **Sectorbalans**: Welke sectoren zijn onderbelicht?
+   (zorg, energie, overheid, agrifood, finance, industrie, retail, onderwijs)
+3. **Diverse onderwerpen**: Zoek spreiding over Explainable AI, Green AI,
+   MLOps/LLMOps, AI-ethiek, AI-Act, praktijkcases
 4. **Bronnen-strategie**: Welke Nederlandse bronnen zijn relevant? **BELANGRIJK: DIVERSIFIEER!**
 
    **Prioriteit 1 - Vakmedia & Nieuws** (meest productief voor unieke personen):
@@ -166,7 +168,8 @@ Als je een interessante persoon vindt met voldoende informatie:
    - organization: Bedrijf/organisatie
    - role: Functie/rol
    - expertise: Expertisegebied (bijv. "AI Act implementatie", "Green AI", "MLOps")
-   - why_now: Waarom relevant (bijv. "Spreekt op AI Act Congres 2025", "Nieuw onderzoek gepubliceerd")
+   - why_now: Waarom relevant
+     (bijv. "Spreekt op AI Act Congres 2025", "Nieuw onderzoek gepubliceerd")
    - sources: Lijst met URLs (minimaal 1, maximaal 3)
    - contact_info: Email en/of LinkedIn als beschikbaar (leeg object als niet beschikbaar)
 
@@ -232,6 +235,10 @@ Voer deze query nu uit volgens de bovenstaande instructies."""
 
 REPORT_GENERATION_PROMPT = """Maak een rapport van de gevonden kandidaten voor AIToday Live.
 
+BELANGRIJK: Voor elke nieuwe kandidaat moet je EERST de enrich_candidate tool aanroepen om de
+verrijkte informatie (uitgebreide topics en relevance) op te slaan. Pas DAARNA genereer je het
+volledige markdown rapport.
+
 ## Nieuwe kandidaten deze week
 {candidates_json}
 
@@ -239,6 +246,21 @@ REPORT_GENERATION_PROMPT = """Maak een rapport van de gevonden kandidaten voor A
 {recent_guests_json}
 
 Indicatoren:
+
+## Werkwijze:
+
+1. Voor elke kandidaat in de nieuwe kandidaten lijst:
+   - Bedenk 4-5 specifieke, concrete onderwerpen
+     (niet algemeen zoals "AI" maar specifiek zoals
+     "Cijfers over AI-impact op banen in Nederland")
+   - Schrijf een uitgebreide relevance_description van 3-5 zinnen die feitelijk beschrijft:
+     * Wat deze persoon doet/heeft gedaan
+     * Waarom relevant voor AIToday Live
+     * Recente ontwikkelingen of projecten
+     * Geen hype, wel informatief
+   - Roep de enrich_candidate tool aan met deze verrijkte data
+
+2. Nadat je ALLE kandidaten hebt verrijkt via de tool, genereer je het volledige markdown rapport
 
 ## Rapport specificaties
 
@@ -257,14 +279,12 @@ Indicatoren:
 **Naam en functie:** [Naam] - [Rol] bij [Organisatie]
 
 **Mogelijke onderwerpen:**
-- Bullet point 1
-- Bullet point 2
+- Bullet point 1 (specifiek en concreet)
+- Bullet point 2 (specifiek en concreet)
+- etc. (4-5 onderwerpen)
 
-**Waarom interessant:** 3-5 zinnen waarin je feitelijk beschrijft:
-- Wat deze persoon doet/heeft gedaan
-- Waarom relevant voor AIToday Live
-- Recente ontwikkelingen of projecten
-- Geen hype, wel informatief
+**Waarom interessant:** 3-5 zinnen
+(gebruik de verrijkte relevance_description die je via de tool hebt opgeslagen)
 
 **Bronnen:** Maximaal 3 links met korte beschrijving
 
