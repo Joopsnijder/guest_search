@@ -203,6 +203,16 @@ sequenceDiagram
         end
     end
 
+    rect rgb(220, 240, 220)
+        Note over A,S: FASE 2.5: LinkedIn Enrichment
+        loop Voor elke kandidaat
+            A->>S: Search "{name} {org} LinkedIn"
+            S->>A: Results with URLs
+            A->>A: Extract linkedin.com/in/ URL
+            A->>A: Add to contact_info["linkedin"]
+        end
+    end
+
     rect rgb(240, 220, 200)
         Note over A,FS: FASE 3: Rapporteren + Enrichment
         A->>C: Generate report prompt + candidates JSON
@@ -446,6 +456,70 @@ sequenceDiagram
    - Trello cards have same detail as reports
    - No manual copying/pasting
    - Consistent data across all outputs
+
+### 6.6 LinkedIn Profile Enrichment
+
+**Strategie:**
+
+Na het vinden van kandidaten (Fase 2), maar vóór rapport generatie (Fase 3), zoekt het systeem automatisch LinkedIn profielen voor alle kandidaten.
+
+**Werkwijze:**
+
+1. **Voor elke kandidaat**:
+   ```python
+   query = f'"{name}" {organization} LinkedIn'
+   results = self.smart_search.search(query, num_results=5)
+   ```
+
+2. **URL extractie**:
+   - Loop door search results
+   - Find first URL containing `linkedin.com/in/`
+   - Check beide `link` en `url` keys (provider compatibility)
+
+3. **Data update**:
+   ```python
+   if linkedin_url:
+       candidate["contact_info"]["linkedin"] = linkedin_url
+   ```
+
+4. **Error handling**:
+   - Silent fail: LinkedIn is nice-to-have, not critical
+   - Shows warning only in DEBUG_TOOLS mode
+   - Continues with other candidates if one fails
+
+**Output:**
+
+```
+╭─────────────────────────────────────────╮
+│ 🔗 LINKEDIN ENRICHMENT                  │
+│ Zoek LinkedIn profielen voor kandidaten │
+╰─────────────────────────────────────────╯
+✓ LinkedIn gevonden: Lokke Moerel
+✓ LinkedIn gevonden: Maarten Stolk
+╭───── LinkedIn Enrichment Voltooid ──────╮
+│  ✓  LinkedIn profielen  2/2              │
+╰─────────────────────────────────────────╯
+```
+
+**Trello Integration:**
+
+LinkedIn links verschijnen bovenaan Trello kaarten in Contact sectie:
+
+```
+CEO bij Deeploy
+
+Contact:
+- LinkedIn: https://nl.linkedin.com/in/mjwstolk
+
+Waarom interessant:
+[...]
+```
+
+**Benefits:**
+- 🎯 **One-click contact** - Production team kan direct contact leggen
+- ⚡ **Automatic** - Geen handmatig zoekwerk nodig
+- 🔄 **Reliable** - Gebruikt bestaande SmartSearch infrastructure
+- 📋 **Well-integrated** - LinkedIn verschijnt in alle outputs (JSON + Trello)
 
 ## 7. Deployment View
 

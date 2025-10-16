@@ -12,12 +12,13 @@ AI-driven podcast guest finder and topic researcher with intelligent search and 
 🎓 **Learning System** - Agent learns from previous searches to improve strategy over time
 💰 **Prompt Caching** - 70-80% cost reduction via Anthropic prompt caching (automatic name extraction + multi-turn conversations)
 ✨ **Content Enrichment** - Automatic expansion of candidate details during report generation for richer Trello cards
+🔗 **LinkedIn Enrichment** - Automatic LinkedIn profile discovery for all candidates
 🔍 **Topic Research** - Separate tool to find interesting AI topics for your podcast
 🔄 **Multi-Provider Fallback** - Serper → SearXNG → Brave → Google Scraper
 ⚡ **Smart Rate Limiting** - Automatic provider skipping on 402/429 errors
 💾 **Intelligent Caching** - 1-day result cache to minimize API calls
 🎯 **Interactive Selection** - Beautiful terminal UI to review and select guests
-📋 **Trello Integration** - One-click export of guests to Trello boards with enriched content
+📋 **Trello Integration** - One-click export with LinkedIn links at top of cards
 📝 **Rich Markdown Reports** - Beautiful terminal-rendered reports with syntax highlighting
 ✅ **Well Tested** - 192 tests covering 11 critical areas (guest finder + topic researcher + learning)
 📊 **Arc42 Documentation** - Complete architecture documentation with Mermaid diagrams
@@ -67,10 +68,11 @@ This will:
 1. **Planning Phase**: AI analyzes current trends and creates search strategy
 2. **Search Phase**: AI agent finds potential guests using web search
 3. **Analysis Phase**: Fetches full page content to identify specific people
-4. **Report Generation**: Creates a markdown report with enriched candidate details
-5. **Content Enrichment**: AI expands topics and relevance descriptions for each candidate
-6. **Report Preview** (optional): View formatted report in terminal with Rich markdown
-7. **Interactive Selection**: Prompts to review and select guests for Trello
+4. **LinkedIn Enrichment**: Automatically finds LinkedIn profiles for all candidates
+5. **Report Generation**: Creates a markdown report with enriched candidate details
+6. **Content Enrichment**: AI expands topics and relevance descriptions for each candidate
+7. **Report Preview** (optional): View formatted report in terminal with Rich markdown
+8. **Interactive Selection**: Prompts to review and select guests for Trello
 
 **Alternative workflows:**
 
@@ -248,6 +250,43 @@ During report generation, the AI automatically enriches each candidate with deta
   "relevance_description": "Professor Global ICT Law aan Tilburg University met focus op de praktische toepassing van nieuwe AI wetgeving. Haar expertise ligt op het snijvlak van juridische compliance en ethische AI-ontwikkeling..."
 }
 ```
+
+### LinkedIn Enrichment
+After finding candidates, the system automatically searches for LinkedIn profiles:
+- 🔍 **Automatic Search**: For each candidate, searches `"{name} {organization} LinkedIn"`
+- 🎯 **Profile Extraction**: Finds first `linkedin.com/in/` URL in results
+- 📋 **Trello Integration**: LinkedIn links appear at top of Trello cards
+- ⚡ **Fast & Reliable**: Uses existing SmartSearch infrastructure
+- 🔄 **Graceful Degradation**: Silently skips if profile not found
+
+**Example output:**
+```
+╭─────────────────────────────────────────╮
+│ 🔗 LINKEDIN ENRICHMENT                  │
+│ Zoek LinkedIn profielen voor kandidaten │
+╰─────────────────────────────────────────╯
+✓ LinkedIn gevonden: Lokke Moerel
+✓ LinkedIn gevonden: Maarten Stolk
+╭───── LinkedIn Enrichment Voltooid ──────╮
+│  ✓  LinkedIn profielen  2/2              │
+╰─────────────────────────────────────────╯
+```
+
+**Trello card layout:**
+```
+CEO bij Deeploy
+
+Contact:
+- LinkedIn: https://nl.linkedin.com/in/mjwstolk  ← Automatic!
+
+Waarom interessant:
+[Detailed enriched description...]
+
+Mogelijke onderwerpen:
+- [5 specific topics...]
+```
+
+This makes it easy for the production team to contact guests with one click!
 
 ### Learning System
 The agent automatically learns from previous search sessions to improve its strategy:

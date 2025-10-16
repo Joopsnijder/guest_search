@@ -93,8 +93,13 @@ graph TB
 
 </div>
 
+**Phase 2.5: LinkedIn Enrichment** 🔗
+- Auto-search LinkedIn profiles
+- Extract linkedin.com/in/ URLs
+- Add to contact info
+
 **Phase 3: Report & Export** 📋
-- **Content enrichment** (new!)
+- **Content enrichment**
 - Generate markdown report
 - Interactive selection UI
 - One-click Trello export
@@ -686,19 +691,49 @@ graph LR
 
 ---
 
+## 🔗 LinkedIn Enrichment: Easy Contact
+
+**Problem:** Production team needs to manually search LinkedIn for each guest
+
+**Solution:** Automatic LinkedIn profile discovery after search phase
+
+**How it works:**
+1. For each candidate: Search `"{name} {organization} LinkedIn"`
+2. Extract first `linkedin.com/in/` URL from results
+3. Add to `contact_info["linkedin"]`
+4. Show at top of Trello cards
+
+**Example output:**
+```
+✓ LinkedIn gevonden: Lokke Moerel
+✓ LinkedIn gevonden: Maarten Stolk
+LinkedIn profielen: 2/2
+```
+
+**Trello card:**
+```
+CEO bij Deeploy
+
+Contact:
+- LinkedIn: https://nl.linkedin.com/in/mjwstolk ← One click!
+```
+
+---
+
 ## Key Features Summary
 
 **What Makes It Special:**
 
 - ✅ **AI-powered strategic planning** - Not just keyword search
 - ✅ **Content enrichment** - Rich details for Trello cards
+- ✅ **LinkedIn enrichment** - Automatic profile discovery
 - ✅ **Prompt caching** - 70-80% cost reduction via Anthropic caching
 - ✅ **Multi-provider fallback** - Never fails due to rate limits
 - ✅ **Automatic name extraction** - Regex-based person detection
 - ✅ **Multi-turn conversations** - Proper tool call sequences
 - ✅ **Smart deduplication** - 12-week guest tracking
 - ✅ **Beautiful terminal UI** - Professional & user-friendly
-- ✅ **One-click Trello export** - Seamless workflow with enriched content
+- ✅ **One-click Trello export** - LinkedIn links at top of cards
 - ✅ **Comprehensive testing** - 192 tests, all passing
 - ✅ **Cost-effective** - ~$0.01 per search (with caching)
 
