@@ -11,6 +11,7 @@ AI-driven podcast guest finder and topic researcher with intelligent search and 
 🤖 **AI-Powered Search** - Claude Sonnet 4 agent with extended thinking for strategic guest finding
 🎓 **Learning System** - Agent learns from previous searches to improve strategy over time
 💰 **Prompt Caching** - 70-80% cost reduction via Anthropic prompt caching (automatic name extraction + multi-turn conversations)
+🧠 **Smart NER Extraction** - spaCy Dutch NER model for intelligent person name detection (with regex fallback)
 ✨ **Content Enrichment** - Automatic expansion of candidate details during report generation for richer Trello cards
 🔗 **LinkedIn Enrichment** - Automatic LinkedIn profile discovery for all candidates
 🔍 **Topic Research** - Separate tool to find interesting AI topics for your podcast
@@ -34,7 +35,12 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Download Dutch NER model for spaCy (for smart person extraction)
+python -m spacy download nl_core_news_md
 ```
+
+**Note**: The system uses spaCy with a Dutch NER model for intelligent person name extraction from web pages. If the model is not available, it automatically falls back to regex-based extraction.
 
 ### 2. Configure API Keys
 
