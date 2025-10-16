@@ -7,13 +7,13 @@ class TestTopicAgentInitialization:
     """Test initializing the topic finder agent."""
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_agent_initialization(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_agent_initialization(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test that agent initializes with correct attributes."""
         from src.topic_search.agent import TopicFinderAgent
 
         mock_client = MagicMock()
-        mock_anthropic.return_value = mock_client
+        mock_get_client.return_value = mock_client
 
         agent = TopicFinderAgent()
 
@@ -27,9 +27,9 @@ class TestTopicToolDefinitions:
     """Test topic-specific tool definitions."""
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
+    @patch("src.utils.portkey_client.get_anthropic_client")
     def test_get_topic_tools_returns_correct_tools(
-        self, mock_anthropic, mock_search_tool, mock_env_vars
+        self, mock_get_client, mock_search_tool, mock_env_vars
     ):
         """Test that topic tools are correctly defined."""
         from src.topic_search.agent import TopicFinderAgent
@@ -46,8 +46,8 @@ class TestTopicToolDefinitions:
         assert "save_topic" in tool_names
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_save_topic_tool_schema(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_save_topic_tool_schema(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test that save_topic tool has correct schema."""
         from src.topic_search.agent import TopicFinderAgent
 
@@ -81,9 +81,9 @@ class TestTopicToolHandling:
     """Test handling of topic-specific tool calls."""
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
+    @patch("src.utils.portkey_client.get_anthropic_client")
     def test_handle_web_search(
-        self, mock_anthropic, mock_search_tool, mock_env_vars, mock_search_results
+        self, mock_get_client, mock_search_tool, mock_env_vars, mock_search_results
     ):
         """Test handling web_search tool call."""
         from src.topic_search.agent import TopicFinderAgent
@@ -100,10 +100,10 @@ class TestTopicToolHandling:
         assert result["provider"] == "TestProvider"
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
+    @patch("src.utils.portkey_client.get_anthropic_client")
     @patch("requests.get")
     def test_handle_fetch_page_content(
-        self, mock_get, mock_anthropic, mock_search_tool, mock_env_vars
+        self, mock_get, mock_get_client, mock_search_tool, mock_env_vars
     ):
         """Test handling fetch_page_content tool call."""
         from src.topic_search.agent import TopicFinderAgent
@@ -123,8 +123,8 @@ class TestTopicToolHandling:
         assert "Some content" in result["content"]
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_handle_save_topic(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_handle_save_topic(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test handling save_topic tool call."""
         from src.topic_search.agent import TopicFinderAgent
 
@@ -148,8 +148,8 @@ class TestTopicToolHandling:
         assert agent.topics[0]["title"] == "AI in Healthcare"
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_handle_multiple_save_topics(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_handle_multiple_save_topics(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test saving multiple topics."""
         from src.topic_search.agent import TopicFinderAgent
 
@@ -175,8 +175,8 @@ class TestTopicReportGeneration:
     """Test report generation for topics."""
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_generate_report_with_no_topics(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_generate_report_with_no_topics(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test generating report when no topics found."""
         from src.topic_search.agent import TopicFinderAgent
 
@@ -187,16 +187,24 @@ class TestTopicReportGeneration:
         assert len(agent.topics) == 0
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    @patch("builtins.open", create=True)
-    @patch("os.makedirs")
+    @patch("src.utils.portkey_client.get_anthropic_client")
     def test_generate_report_with_topics(
-        self, mock_makedirs, mock_open, mock_anthropic, mock_search_tool, mock_env_vars
+        self, mock_get_client, mock_search_tool, mock_env_vars, monkeypatch
     ):
         """Test generating report with topics."""
         from src.topic_search.agent import TopicFinderAgent
 
-        # Mock API response
+        # Mock file operations first
+        monkeypatch.setattr("os.makedirs", MagicMock())
+        mock_file = MagicMock()
+        mock_file.__enter__ = MagicMock(return_value=mock_file)
+        mock_file.__exit__ = MagicMock(return_value=False)
+        monkeypatch.setattr("builtins.open", MagicMock(return_value=mock_file))
+
+        # Create agent first
+        agent = TopicFinderAgent()
+
+        # Now set up the mock client directly on the agent
         mock_client = MagicMock()
         mock_response = MagicMock()
         text_block = MagicMock()
@@ -204,9 +212,9 @@ class TestTopicReportGeneration:
         text_block.text = "# Topic Report\n\nSome topics..."
         mock_response.content = [text_block]
         mock_client.messages.create.return_value = mock_response
-        mock_anthropic.return_value = mock_client
 
-        agent = TopicFinderAgent()
+        # Directly set the client on the agent
+        agent.client = mock_client
 
         # Add a topic
         agent.topics.append(
@@ -227,8 +235,8 @@ class TestTopicReportGeneration:
         assert len(agent.topics) == 1
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_display_report(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_display_report(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test displaying report in terminal."""
         from src.topic_search.agent import TopicFinderAgent
 
@@ -246,9 +254,9 @@ class TestTopicSearchFlow:
     """Test the complete topic search flow."""
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
+    @patch("src.utils.portkey_client.get_anthropic_client")
     def test_run_full_cycle_integration(
-        self, mock_anthropic, mock_search_tool, mock_env_vars, monkeypatch
+        self, mock_get_client, mock_search_tool, mock_env_vars, monkeypatch
     ):
         """Test complete cycle from search to report."""
         from src.topic_search.agent import TopicFinderAgent
@@ -259,7 +267,7 @@ class TestTopicSearchFlow:
         mock_response.stop_reason = "end_turn"
         mock_response.content = []
         mock_client.messages.create.return_value = mock_response
-        mock_anthropic.return_value = mock_client
+        mock_get_client.return_value = mock_client
 
         # Patch makedirs and open to avoid file operations
         monkeypatch.setattr("os.makedirs", MagicMock())
@@ -278,10 +286,10 @@ class TestErrorHandling:
     """Test error handling in topic agent."""
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
+    @patch("src.utils.portkey_client.get_anthropic_client")
     @patch("requests.get")
     def test_fetch_page_content_network_error(
-        self, mock_get, mock_anthropic, mock_search_tool, mock_env_vars
+        self, mock_get, mock_get_client, mock_search_tool, mock_env_vars
     ):
         """Test handling network error when fetching page."""
         from src.topic_search.agent import TopicFinderAgent
@@ -296,10 +304,10 @@ class TestErrorHandling:
         assert "Network error" in result["error"]
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
+    @patch("src.utils.portkey_client.get_anthropic_client")
     @patch("requests.get")
     def test_fetch_page_content_http_error(
-        self, mock_get, mock_anthropic, mock_search_tool, mock_env_vars
+        self, mock_get, mock_get_client, mock_search_tool, mock_env_vars
     ):
         """Test handling HTTP error when fetching page."""
         from src.topic_search.agent import TopicFinderAgent
@@ -317,8 +325,8 @@ class TestErrorHandling:
         assert "HTTP 404" in result["error"]
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_handle_unknown_tool(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_handle_unknown_tool(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test handling unknown tool call."""
         from src.topic_search.agent import TopicFinderAgent
 
@@ -333,8 +341,8 @@ class TestCategoryValidation:
     """Test topic category handling."""
 
     @patch("src.utils.smart_search_tool.SmartSearchTool")
-    @patch("src.topic_search.agent.Anthropic")
-    def test_all_categories_accepted(self, mock_anthropic, mock_search_tool, mock_env_vars):
+    @patch("src.utils.portkey_client.get_anthropic_client")
+    def test_all_categories_accepted(self, mock_get_client, mock_search_tool, mock_env_vars):
         """Test that all defined categories are accepted."""
         from src.topic_search.agent import TopicFinderAgent
 
