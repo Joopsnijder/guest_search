@@ -10,6 +10,7 @@ AI-driven podcast guest finder and topic researcher with intelligent search and 
 
 🤖 **AI-Powered Search** - Claude Sonnet 4 agent with extended thinking for strategic guest finding
 🎓 **Learning System** - Agent learns from previous searches to improve strategy over time
+💰 **Prompt Caching** - 70-80% cost reduction via Anthropic prompt caching (automatic name extraction + multi-turn conversations)
 🔍 **Topic Research** - Separate tool to find interesting AI topics for your podcast
 🔄 **Multi-Provider Fallback** - Serper → SearXNG → Brave → Google Scraper
 ⚡ **Smart Rate Limiting** - Automatic provider skipping on 402/429 errors

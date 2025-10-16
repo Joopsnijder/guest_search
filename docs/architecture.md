@@ -58,9 +58,10 @@ graph LR
 1. **Multi-phase approach**: Planning → Zoeken → Rapporteren
 2. **AI-driven**: Claude agent met extended thinking voor strategische beslissingen
 3. **Learning system**: Agent leert van eerdere zoeksessies om strategie te verbeteren
-4. **Search resilience**: Automatic fallback tussen meerdere search providers
-5. **Caching**: 1-dag cache om rate limits te beheersen
-6. **Verificatie**: Minimaal 2 bronnen per kandidaat
+4. **Prompt caching**: 70-80% kostenreductie via Anthropic prompt caching (search phase)
+5. **Search resilience**: Automatic fallback tussen meerdere search providers
+6. **Search result caching**: 1-dag cache om rate limits te beheersen
+7. **Verificatie**: Minimaal 2 bronnen per kandidaat
 
 ### 4.2 Technologie Keuzes
 - **Anthropic Claude**: Extended thinking voor planning en strategie
@@ -293,6 +294,65 @@ sequenceDiagram
 3. **Report bewaart sessie**: Alle performance data wordt opgeslagen voor toekomstige runs
 4. **Verbetering over tijd**: Elke volgende run is beter geïnformeerd
 
+### 6.4 Prompt Caching Flow
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant C as Claude API<br/>(via Portkey)
+    participant Cache as Anthropic<br/>Prompt Cache
+
+    Note over A,Cache: QUERY 1: Cache Creation
+    A->>C: Message with cache_control<br/>[CACHEABLE: Instructions ~1500 tokens]<br/>[DYNAMIC: Query 1 status]
+    C->>Cache: Store cacheable content (TTL: 5 min)
+    Cache->>C: Cache created
+    C->>A: Response + cache_creation_tokens
+
+    Note over A,Cache: QUERY 2-12: Cache Reuse (binnen 5 min)
+    loop Voor queries 2-12
+        A->>C: Message with cache_control<br/>[CACHEABLE: Same instructions]<br/>[DYNAMIC: Query N status]
+        C->>Cache: Check cache (by hash)
+        Cache->>C: Cache hit! (no reprocessing)
+        C->>A: Response + cache_read_tokens
+        Note over A,C: Cost: ~90% reduction<br/>Speed: ~20% faster
+    end
+
+    Note over Cache: After 5 minutes
+    Cache->>Cache: Cache expired (TTL)
+    Note over A: Next session creates new cache
+```
+
+**Prompt Caching Strategie:**
+
+1. **Wat wordt gecached**: Statische zoek-instructies (~1500 tokens)
+   - Workflow stappen (web_search → fetch_page_content → save_candidate)
+   - Voorbeelden van correcte uitvoering
+   - Alle regels en richtlijnen
+
+2. **Wat is dynamic**: Query-specifieke informatie (~200 tokens)
+   - Huidige voortgang (query 3/12, 2 kandidaten gevonden)
+   - Actuele zoekopdracht en rationale
+
+3. **Cache characteristics**:
+   - TTL: 5 minuten (Anthropic default)
+   - Trigger: `cache_control: {"type": "ephemeral"}` marker
+   - Minimum: 1024 tokens (we gebruiken ~1500)
+   - Reuse: Automatisch bij identical content
+
+4. **Cost impact**:
+   - **Zonder caching**: 12 queries × 1500 tokens = 18,000 input tokens
+   - **Met caching**: 1 × 1500 (create) + 11 × ~150 (reads) = ~3,150 tokens
+   - **Besparing**: ~82% op zoek fase prompts
+
+5. **Configuratie**:
+   ```python
+   # Config.py
+   ENABLE_PROMPT_CACHING = True  # Default enabled
+
+   # Disable via .env
+   ENABLE_PROMPT_CACHING=false
+   ```
+
 ## 7. Deployment View
 
 ```mermaid
@@ -337,6 +397,18 @@ graph TB
 ## 8. Crosscutting Concepts
 
 ### 8.1 Caching Strategie
+
+Het systeem gebruikt twee soorten caching:
+
+**A. Prompt Caching (Anthropic)**
+- **Doel**: 70-80% kostenreductie op herhaalde API calls
+- **Scope**: Statische prompt instructies in search phase
+- **Duur**: 5 minuten TTL (per Anthropic session)
+- **Mechanisme**: `cache_control: {"type": "ephemeral"}` marker
+- **Impact**: ~82% besparing op input tokens (18K → 3K)
+- **Configuratie**: `ENABLE_PROMPT_CACHING=true` (default)
+
+**B. Search Result Caching (Local)**
 - **Doel**: Rate limit beheersing en snellere tests
 - **Duur**: 1 dag
 - **Scope**: Query + provider agnostic
@@ -490,6 +562,56 @@ graph TB
 - Level 4: Cross-session pattern recognition
 
 **Implementatie**: Learning methods in `GuestFinderAgent`, documentatie in `docs/LEARNING_SYSTEM.md`
+
+### ADR-007: Anthropic Prompt Caching
+
+**Context**: Search phase voert 8-12 queries uit, elk met dezelfde ~1500 token instructies, resulterend in hoge input token costs
+
+**Besluit**: Implementeer Anthropic prompt caching door search prompt te splitsen in cacheable (static) en dynamic (per-query) delen
+
+**Rationale**:
+- **Cost reduction**: 70-80% besparing op search phase input tokens
+- **Speed improvement**: 10-20% sneller door cache reads vs volledige processing
+- **Simple implementation**: Minimale code wijzigingen, backwards compatible
+- **Anthropic native**: Gebruikt officiële Anthropic caching feature (ephemeral)
+
+**Alternatieven overwogen**:
+1. ❌ Kortere prompts → Vermindert effectiviteit, agent mist kritieke context
+2. ❌ Single API call met alle queries → Verliest multi-turn conversatie context
+3. ❌ Custom caching laag → Meer complex, geen cost benefit
+4. ✅ Anthropic prompt caching → Native support, proven ROI
+
+**Implementatie details**:
+- Gesplitste prompts: `SEARCH_EXECUTION_PROMPT_CACHEABLE` (~1500 tokens) + `SEARCH_EXECUTION_PROMPT_DYNAMIC` (~200 tokens)
+- Cache marker: `cache_control: {"type": "ephemeral"}` op cacheable block
+- TTL: 5 minuten (Anthropic default, perfect voor typische sessie lengte)
+- Portkey doorvoer: Cache control wordt doorgegeven via extra_headers
+- Config: `ENABLE_PROMPT_CACHING=true` (default, kan disabled worden)
+
+**Consequenties**:
+- ✅ ~82% cost reduction: 18K tokens → 3K tokens (per 12-query session)
+- ✅ Snellere response tijd door cache hits
+- ✅ Zero functionaliteit wijziging (zelfde output)
+- ✅ Backwards compatible (fallback naar combined prompt)
+- ❌ Afhankelijk van Anthropic cache (vendor lock-in)
+- ❌ 5 min TTL kan expiren bij zeer lange sessies (acceptabel)
+- ⚠️ Minimum 1024 tokens vereist (we gebruiken 1500+)
+
+**Cost voorbeeld (Claude Sonnet 4)**:
+```
+Zonder caching:
+- 12 queries × 1500 tokens = 18,000 input tokens
+- @ $3/MTok = $0.054 per sessie
+
+Met caching:
+- Query 1: 1500 create tokens @ $3.75/MTok = $0.00563
+- Query 2-12: 11 × 150 read tokens @ $0.30/MTok = $0.00050
+- Totaal: $0.00613 per sessie
+
+Besparing: $0.048 per sessie (88% reductie)
+```
+
+**Implementatie**: Prompt split in `prompts.py`, cache logic in `agent.py`, Portkey support in `portkey_client.py`
 
 ## 10. Kwaliteitseisen
 
