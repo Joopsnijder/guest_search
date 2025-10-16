@@ -479,6 +479,19 @@ class GuestFinderAgent:
             return {"already_recommended": False}
 
         elif tool_name == "save_candidate":
+            # Check for duplicates based on name (case-insensitive)
+            candidate_name = tool_input.get("name", "").lower()
+            is_duplicate = any(
+                c.get("name", "").lower() == candidate_name for c in self.candidates
+            )
+
+            if is_duplicate:
+                return {
+                    "status": "duplicate",
+                    "message": f"Kandidaat '{tool_input.get('name')}' is al opgeslagen",
+                    "total_candidates": len(self.candidates),
+                }
+
             self.candidates.append(tool_input)
             return {"status": "saved", "total_candidates": len(self.candidates)}
 
@@ -644,7 +657,7 @@ Er is nog geen historische data beschikbaar.\n"
             table.add_row(
                 "[green]✓[/green]",
                 "Focus",
-                strategy_json.get("week_focus", "Niet gespecificeerd")[:80],
+                strategy_json.get("week_focus", "Niet gespecificeerd")[:150],
             )
 
             if "search_queries" in strategy_json:
@@ -715,7 +728,7 @@ Er is nog geen historische data beschikbaar.\n"
                 candidates_before = len(self.candidates)
 
                 # Update progress description with current query
-                short_query = query_obj["query"][:50]
+                short_query = query_obj["query"][:100]
                 progress.update(
                     task,
                     description=f"[cyan]{short_query}...",
@@ -894,10 +907,35 @@ Er is nog geen historische data beschikbaar.\n"
 
         enriched_count = 0
 
-        with self.console.status("[cyan]LinkedIn profielen zoeken...[/cyan]"):
-            for candidate in self.candidates:
+        # Create progress bar
+        progress = Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TextColumn("•"),
+            TextColumn("[cyan]{task.fields[found]} gevonden"),
+        )
+
+        with Live(progress, console=self.console):
+            task = progress.add_task(
+                "[cyan]LinkedIn profielen zoeken...",
+                total=len(self.candidates),
+                found=0,
+            )
+
+            for i, candidate in enumerate(self.candidates):
                 name = candidate.get("name", "")
                 organization = candidate.get("organization", "")
+
+                # Update progress with current candidate
+                short_name = name[:60] if name else "Onbekend"
+                progress.update(
+                    task,
+                    description=f"[cyan]{short_name}",
+                    completed=i,
+                    found=enriched_count,
+                )
 
                 if not name or not organization:
                     continue
@@ -926,13 +964,21 @@ Er is nog geen historische data beschikbaar.\n"
                         candidate["contact_info"]["linkedin"] = linkedin_url
                         enriched_count += 1
 
-                        self.console.print(f"[dim]✓ LinkedIn gevonden: {name}[/dim]")
+                        # Update found count
+                        progress.update(task, found=enriched_count)
 
                 except Exception as e:
                     # Silent fail - LinkedIn is nice to have, not critical
                     if os.getenv("DEBUG_TOOLS"):
                         self.console.print(f"[dim]⚠️  LinkedIn search failed for {name}: {e}[/dim]")
                     continue
+
+            # Mark as complete
+            progress.update(
+                task,
+                description="[green]✓ LinkedIn enrichment voltooid",
+                completed=len(self.candidates),
+            )
 
         # Show summary
         summary = Table(show_header=False, box=None)
@@ -1051,10 +1097,6 @@ Er is nog geen historische data beschikbaar.\n"
                                 # Convert tool input to dict
                                 tool_input = dict(block.input) if block.input else {}
                                 result = self._handle_enrich_candidate(tool_input)
-
-                                # Show progress
-                                name = tool_input.get("name", "unknown")  # type: ignore
-                                self.console.print(f"[dim]✓ Verrijkt: {name}[/dim]")
 
                                 tool_results.append(
                                     {

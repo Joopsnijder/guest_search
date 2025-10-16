@@ -190,13 +190,20 @@ class InteractiveGuestSelector:
                 all_guests.append(guest)
                 guest_types.append("new")
 
-        # Add recent guests
-        if self.recent_guests:
+        # Filter recent guests to exclude duplicates with new candidates
+        # Compare by name (case-insensitive)
+        new_candidate_names = {c.get("name", "").lower() for c in self.new_candidates}
+        filtered_recent_guests = [
+            g for g in self.recent_guests if g.get("name", "").lower() not in new_candidate_names
+        ]
+
+        # Add recent guests (excluding duplicates)
+        if filtered_recent_guests:
             self.console.print(
                 "\n[bold yellow]Recent aanbevolen (laatste 2 weken):[/bold yellow]\n"
             )
             start_index = len(all_guests) + 1
-            for i, guest in enumerate(self.recent_guests, start_index):
+            for i, guest in enumerate(filtered_recent_guests, start_index):
                 self.display_guest(guest, i, is_recent=True)
                 all_guests.append(guest)
                 guest_types.append("recent")
