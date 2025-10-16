@@ -89,6 +89,8 @@ class MessagesAdapter:
 
         This method translates Anthropic's messages.create() API to Portkey's
         chat.completions.create() API while maintaining compatibility.
+
+        Supports Anthropic prompt caching via cache_control in message content.
         """
         # Use Model Catalog format: @provider-slug/model-name
         full_model = f"{self.provider_slug}/{self.model_name}"
@@ -98,7 +100,11 @@ class MessagesAdapter:
 
         # Add system message if provided
         if system:
-            openai_messages.append({"role": "system", "content": system})
+            # Support cache_control in system message
+            if isinstance(system, dict):
+                openai_messages.append({"role": "system", "content": system})
+            else:
+                openai_messages.append({"role": "system", "content": system})
 
         # Convert messages
         if messages:
@@ -107,13 +113,19 @@ class MessagesAdapter:
                 content = msg.get("content", "")
 
                 # If content is a list (Anthropic format with blocks), extract text
+                # and preserve cache_control markers
                 if isinstance(content, list):
                     # Filter out empty blocks and extract text
                     text_parts = []
+                    has_cache_control = False
+
                     for block in content:
                         if isinstance(block, dict):
                             if block.get("type") == "text" and block.get("text"):
                                 text_parts.append(block["text"])
+                                # Check if this block has cache_control
+                                if "cache_control" in block:
+                                    has_cache_control = True
                             elif block.get("type") == "tool_result":
                                 # For tool results, include the content
                                 result_content = block.get("content", "")
@@ -128,6 +140,16 @@ class MessagesAdapter:
 
                     content = "\n".join(text_parts) if text_parts else ""
 
+                    # If cache_control was present, we need to preserve it
+                    # Portkey passes through Anthropic-specific fields
+                    if has_cache_control and content:
+                        # Keep the original list structure for cache_control
+                        openai_messages.append({
+                            "role": msg["role"],
+                            "content": msg["content"]  # Use original list format
+                        })
+                        continue
+
                 # Only add message if it has non-empty content
                 # (OpenAI allows empty final assistant message, but not others)
                 if content or (msg["role"] == "assistant" and msg == messages[-1]):
@@ -141,12 +163,18 @@ class MessagesAdapter:
         if tools:
             openai_tools = self._convert_tools_to_openai(tools)
 
+        # Add Anthropic beta header for prompt caching support
+        # This tells Portkey/Anthropic to enable caching features
+        headers = kwargs.pop("extra_headers", {})
+        headers["anthropic-beta"] = "prompt-caching-2024-07-31"
+
         # Call Portkey's chat.completions interface
         response = self.portkey_client.chat.completions.create(
             model=full_model,
             messages=openai_messages,
             max_tokens=max_tokens,
             tools=openai_tools,
+            extra_headers=headers,
             **kwargs
         )
 

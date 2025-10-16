@@ -15,7 +15,12 @@ from src.utils.portkey_client import get_anthropic_client
 from src.utils.smart_search_tool import SmartSearchTool
 
 from .config import Config
-from .prompts import PLANNING_PROMPT, REPORT_GENERATION_PROMPT, SEARCH_EXECUTION_PROMPT
+from .prompts import (
+    PLANNING_PROMPT,
+    REPORT_GENERATION_PROMPT,
+    SEARCH_EXECUTION_PROMPT_CACHEABLE,
+    SEARCH_EXECUTION_PROMPT_DYNAMIC,
+)
 from .tools import get_tools
 
 
@@ -580,7 +585,8 @@ Er is nog geen historische data beschikbaar.\n"
                     progress.update(task, description="[green]✓ Target bereikt!", completed=True)
                     break
 
-                prompt = SEARCH_EXECUTION_PROMPT.format(
+                # Format dynamic part of the prompt
+                dynamic_prompt = SEARCH_EXECUTION_PROMPT_DYNAMIC.format(
                     searches_done=i,
                     total_searches=len(queries),
                     candidates_found=len(self.candidates),
@@ -589,8 +595,28 @@ Er is nog geen historische data beschikbaar.\n"
                     query_rationale=query_obj.get("rationale", ""),
                 )
 
-                # Voeg toe aan conversatie
-                conversation.append({"role": "user", "content": prompt})
+                # Use prompt caching if enabled: cache static instructions, vary dynamic part
+                # Cache TTL is 5 minutes - perfect for 8-12 query sessions
+                if Config.ENABLE_PROMPT_CACHING:
+                    # Use structured content with cache_control marker
+                    conversation.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": SEARCH_EXECUTION_PROMPT_CACHEABLE,
+                                "cache_control": {"type": "ephemeral"}
+                            },
+                            {
+                                "type": "text",
+                                "text": dynamic_prompt
+                            }
+                        ]
+                    })
+                else:
+                    # Legacy mode: combine prompts into single string
+                    combined_prompt = SEARCH_EXECUTION_PROMPT_CACHEABLE + "\n\n" + dynamic_prompt
+                    conversation.append({"role": "user", "content": combined_prompt})
 
                 # Learning: Track sources used in this query
                 sources_used = []

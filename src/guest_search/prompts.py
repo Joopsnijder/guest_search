@@ -68,15 +68,10 @@ Verschillende invalshoeken dekken
 Denk grondig na voordat je de strategie formuleert. Gebruik je thinking budget om de \
 beste aanpak te bepalen."""
 
-SEARCH_EXECUTION_PROMPT = """Je voert nu de zoekstrategie uit die je hebt bedacht.
+# Cacheable part of search prompt (static instructions - repeated 8-12x per session)
+SEARCH_EXECUTION_PROMPT_CACHEABLE = """## 🔍 Zoek Instructies (CACHEABLE)
 
-## Huidige status
-- Zoekopdrachten uitgevoerd: {searches_done}/{total_searches}
-- Kandidaten gevonden: {candidates_found}/{target_candidates}
-
-## Volgende zoekopdracht
-Query: {current_query}
-Rationale: {query_rationale}
+Deze instructies blijven hetzelfde voor alle queries in deze sessie.
 
 ## ⚠️ CRITICAL: Snippets NEVER contain names!
 
@@ -184,7 +179,7 @@ Als je een interessante persoon vindt met voldoende informatie:
 6. **Save direct**: Zodra je een naam+organisatie+rol hebt → `save_candidate`
 
 ### Stap 5: Beslislogica
-- Als je {target_candidates} kandidaten hebt gevonden: je bent klaar
+- Als je het target aantal kandidaten hebt gevonden: je bent klaar
 - Anders: ga systematisch door met de volgende zoekopdracht
 
 ## ✅ CORRECTE Workflow (VOLG DIT ALTIJD!)
@@ -220,6 +215,20 @@ Als je een interessante persoon vindt met voldoende informatie:
 6. save_candidate met alle details
 
 Werk systematisch en fetch URLs om echte personen te vinden!"""
+
+# Dynamic part of search prompt (changes per query)
+SEARCH_EXECUTION_PROMPT_DYNAMIC = """## 📊 Huidige Sessie Status
+
+- Zoekopdrachten uitgevoerd: {searches_done}/{total_searches}
+- Kandidaten gevonden: {candidates_found}/{target_candidates}
+
+## 🎯 Volgende Zoekopdracht
+
+**Query**: {current_query}
+
+**Rationale**: {query_rationale}
+
+Voer deze query nu uit volgens de bovenstaande instructies."""
 
 REPORT_GENERATION_PROMPT = """Maak een rapport van de gevonden kandidaten voor AIToday Live.
 

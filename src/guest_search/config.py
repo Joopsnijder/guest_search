@@ -24,3 +24,9 @@ class Config:
 
     # Tijdzone
     TIMEZONE = "Europe/Berlin"
+
+    # Prompt caching (via Anthropic)
+    # Enable to cache repetitive prompt content across multiple queries
+    # Reduces API costs by 70-80% and improves response time
+    # Note: Cache TTL is 5 minutes (Anthropic default)
+    ENABLE_PROMPT_CACHING = os.getenv("ENABLE_PROMPT_CACHING", "true").lower() == "true"
