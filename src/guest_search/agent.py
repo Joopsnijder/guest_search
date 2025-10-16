@@ -181,6 +181,210 @@ class GuestFinderAgent:
             ),
         }
 
+    def _extract_persons_with_spacy(self, text: str) -> list[dict]:
+        """
+        Extract person names using spaCy NER (Dutch model).
+        Falls back to regex if spaCy is not available.
+
+        Returns list of dicts with: name, context, (optional) title_match
+        """
+        try:
+            import spacy
+
+            # Try to load Dutch model
+            try:
+                nlp = spacy.load("nl_core_news_md")
+            except OSError:
+                # Model not downloaded, use regex fallback
+                if os.getenv("DEBUG_TOOLS"):
+                    self.console.print(
+                        "[dim]⚠️  spaCy model not found, using regex fallback[/dim]"
+                    )
+                return self._extract_persons_with_regex(text)
+
+            # Process text with spaCy
+            doc = nlp(text)
+
+            potential_persons = []
+            seen_names = set()
+
+            # Extract PERSON entities
+            for ent in doc.ents:
+                if ent.label_ == "PERSON":
+                    name = ent.text.strip()
+
+                    # Skip if already seen (case insensitive)
+                    if name.lower() in seen_names:
+                        continue
+
+                    # Skip single-word names (likely false positives)
+                    if len(name.split()) < 2:
+                        continue
+
+                    # Filter out common false positives
+                    name_lower = name.lower()
+
+                    # Skip if contains numbers (e.g., "Frans Vertregt06")
+                    if any(char.isdigit() for char in name):
+                        continue
+
+                    # Skip if contains certain keywords that indicate it's not a person
+                    false_positive_keywords = [
+                        "children",
+                        "hospital",
+                        "university",
+                        "institute",
+                        "foundation",
+                        "stichting",
+                        "ziekenhuis",
+                        "universiteit",
+                        "instituut",
+                        "company",
+                        "bedrijf",
+                        "ministerie",
+                        "gemeente",
+                    ]
+
+                    if any(keyword in name_lower for keyword in false_positive_keywords):
+                        continue
+
+                    # Skip very long names (>5 words, likely organization names)
+                    if len(name.split()) > 5:
+                        continue
+
+                    seen_names.add(name.lower())
+
+                    # Get context (sentence containing the entity)
+                    sentence = ent.sent.text.strip()
+
+                    # Get wider context (50 chars before, 100 after)
+                    start = max(0, ent.start_char - 50)
+                    end = min(len(text), ent.end_char + 100)
+                    context = text[start:end].replace("\n", " ")
+
+                    # Check if there's a title nearby (Prof., Dr., etc.)
+                    title_match = None
+                    for token in ent.sent:
+                        if token.text in ["Prof.", "Dr.", "Drs.", "Ir.", "Mr."]:
+                            # Check if title is close to the entity
+                            if abs(token.i - ent.start) <= 2:
+                                title_match = f"{token.text} {name}"
+                                break
+
+                    person = {
+                        "name": name,
+                        "context": context,
+                        "sentence": sentence,  # Full sentence for better context
+                    }
+
+                    if title_match:
+                        person["title_match"] = title_match
+
+                    potential_persons.append(person)
+
+            if os.getenv("DEBUG_TOOLS"):
+                self.console.print(
+                    f"[dim]🤖 spaCy found {len(potential_persons)} persons[/dim]"
+                )
+
+            return potential_persons
+
+        except ImportError:
+            # spaCy not installed, use regex fallback
+            if os.getenv("DEBUG_TOOLS"):
+                self.console.print("[dim]⚠️  spaCy not installed, using regex fallback[/dim]")
+            return self._extract_persons_with_regex(text)
+
+    def _extract_persons_with_regex(self, text: str) -> list[dict]:
+        """
+        Legacy regex-based person extraction (fallback).
+        Kept for backwards compatibility when spaCy is unavailable.
+        """
+        import re
+
+        potential_persons = []
+
+        # Pattern 1: Names with titles (Prof., Dr., etc.)
+        title_patterns = [
+            r"(Prof\.?\s+(?:dr\.?\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+            r"(Dr\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+            r"(Drs\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+            r"(Ir\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
+        ]
+
+        for pattern in title_patterns:
+            matches = re.finditer(pattern, text)
+            for match in matches:
+                full_match = match.group(1)
+                name = match.group(2) if len(match.groups()) > 1 else match.group(1)
+                # Get context (50 chars before and after)
+                start = max(0, match.start() - 50)
+                end = min(len(text), match.end() + 100)
+                context = text[start:end].replace("\n", " ")
+                potential_persons.append(
+                    {"name": name, "title_match": full_match, "context": context}
+                )
+
+        # Pattern 2: Names with job titles/roles
+        role_patterns = [
+            r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+),?\s+(hoogleraar|professor|docent|onderzoeker|CEO|CTO|directeur|hoofd|lead|manager|wethouder|burgemeester)",
+            r"(hoogleraar|professor|docent|onderzoeker|CEO|CTO|directeur|hoofd|lead|manager|wethouder|burgemeester)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+            r"volgens\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+            r"door\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+),",
+            r"zegt\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+            r"vertelt\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+            r"aldus\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
+        ]
+
+        for pattern in role_patterns:
+            matches = re.finditer(pattern, text, re.IGNORECASE)
+            for match in matches:
+                # Extract name from match groups
+                name = None
+                for group in match.groups():
+                    if (
+                        group
+                        and len(group.split()) >= 2
+                        and group[0].isupper()
+                        and group.lower()
+                        not in [
+                            "hoogleraar",
+                            "professor",
+                            "docent",
+                            "onderzoeker",
+                            "ceo",
+                            "cto",
+                            "directeur",
+                            "hoofd",
+                            "lead",
+                            "manager",
+                            "wethouder",
+                            "burgemeester",
+                        ]
+                    ):
+                        name = group
+                        break
+
+                if name:
+                    start = max(0, match.start() - 50)
+                    end = min(len(text), match.end() + 100)
+                    context = text[start:end].replace("\n", " ")
+                    potential_persons.append({"name": name, "context": context})
+
+        # Remove duplicates (same name)
+        seen_names = set()
+        unique_persons = []
+        for person in potential_persons:
+            name_lower = person["name"].lower()
+            if name_lower not in seen_names:
+                seen_names.add(name_lower)
+                unique_persons.append(person)
+
+        if os.getenv("DEBUG_TOOLS"):
+            self.console.print(f"[dim]📝 Regex found {len(unique_persons)} persons[/dim]")
+
+        return unique_persons
+
     def _handle_tool_call(self, tool_name, tool_input, silent=False):
         """Verwerk tool calls van de agent"""
 
@@ -238,86 +442,8 @@ class GuestFinderAgent:
                     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
                     text = "\n".join(chunk for chunk in chunks if chunk)
 
-                    # Extract potential person names with context
-                    import re
-
-                    potential_persons = []
-
-                    # Pattern 1: Names with titles (Prof., Dr., etc.)
-                    title_patterns = [
-                        r"(Prof\.?\s+(?:dr\.?\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
-                        r"(Dr\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
-                        r"(Drs\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
-                        r"(Ir\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+))",
-                    ]
-
-                    for pattern in title_patterns:
-                        matches = re.finditer(pattern, text)
-                        for match in matches:
-                            full_match = match.group(1)
-                            name = match.group(2) if len(match.groups()) > 1 else match.group(1)
-                            # Get context (50 chars before and after)
-                            start = max(0, match.start() - 50)
-                            end = min(len(text), match.end() + 100)
-                            context = text[start:end].replace("\n", " ")
-                            potential_persons.append(
-                                {"name": name, "title_match": full_match, "context": context}
-                            )
-
-                    # Pattern 2: Names with job titles/roles
-                    role_patterns = [
-                        r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+),?\s+(hoogleraar|professor|docent|onderzoeker|CEO|CTO|directeur|hoofd|lead|manager|wethouder|burgemeester)",
-                        r"(hoogleraar|professor|docent|onderzoeker|CEO|CTO|directeur|hoofd|lead|manager|wethouder|burgemeester)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
-                        r"volgens\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
-                        r"door\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+),",
-                        r"zegt\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
-                        r"vertelt\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
-                        r"aldus\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)",
-                    ]
-
-                    for pattern in role_patterns:
-                        matches = re.finditer(pattern, text, re.IGNORECASE)
-                        for match in matches:
-                            # Extract name from match groups
-                            name = None
-                            for group in match.groups():
-                                if (
-                                    group
-                                    and len(group.split()) >= 2
-                                    and group[0].isupper()
-                                    and group.lower()
-                                    not in [
-                                        "hoogleraar",
-                                        "professor",
-                                        "docent",
-                                        "onderzoeker",
-                                        "ceo",
-                                        "cto",
-                                        "directeur",
-                                        "hoofd",
-                                        "lead",
-                                        "manager",
-                                        "wethouder",
-                                        "burgemeester",
-                                    ]
-                                ):
-                                    name = group
-                                    break
-
-                            if name:
-                                start = max(0, match.start() - 50)
-                                end = min(len(text), match.end() + 100)
-                                context = text[start:end].replace("\n", " ")
-                                potential_persons.append({"name": name, "context": context})
-
-                    # Remove duplicates (same name)
-                    seen_names = set()
-                    unique_persons = []
-                    for person in potential_persons:
-                        name_lower = person["name"].lower()
-                        if name_lower not in seen_names:
-                            seen_names.add(name_lower)
-                            unique_persons.append(person)
+                    # Extract potential person names using spaCy (with regex fallback)
+                    unique_persons = self._extract_persons_with_spacy(text)
 
                     # Truncate text if too long (max 4000 chars)
                     if len(text) > 4000:
