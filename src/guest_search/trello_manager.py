@@ -98,6 +98,21 @@ class TrelloManager:
         elif organization:
             description_parts.append(f"**{organization}**\n")
 
+        # === CONTACT INFO: Direct at the top for easy access ===
+        contact_info = guest.get("contact_info", {})
+        if contact_info:
+            contact_parts = []
+            if "email" in contact_info and contact_info["email"]:
+                contact_parts.append(f"Email: {contact_info['email']}")
+            if "linkedin" in contact_info and contact_info["linkedin"]:
+                contact_parts.append(f"LinkedIn: {contact_info['linkedin']}")
+
+            if contact_parts:
+                description_parts.append("**Contact:**")
+                for part in contact_parts:
+                    description_parts.append(f"- {part}")
+                description_parts.append("")
+
         # === MAIN CONTENT: Relevance and Topics ===
         # Relevance (why interesting) - prefer enriched description over why_now
         if "relevance_description" in guest and guest["relevance_description"]:
@@ -117,22 +132,7 @@ class TrelloManager:
                 description_parts.append(f"- {topic}")
             description_parts.append("")
 
-        # === FOOTER: Contact info and Sources ===
-        # Contact info
-        contact_info = guest.get("contact_info", {})
-        if contact_info:
-            contact_parts = []
-            if "email" in contact_info and contact_info["email"]:
-                contact_parts.append(f"Email: {contact_info['email']}")
-            if "linkedin" in contact_info and contact_info["linkedin"]:
-                contact_parts.append(f"LinkedIn: {contact_info['linkedin']}")
-
-            if contact_parts:
-                description_parts.append("**Contact:**")
-                for part in contact_parts:
-                    description_parts.append(f"- {part}")
-                description_parts.append("")
-
+        # === FOOTER: Sources ===
         # Sources
         if "sources" in guest and guest["sources"]:
             description_parts.append("**Bronnen:**")
