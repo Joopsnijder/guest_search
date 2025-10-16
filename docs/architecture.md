@@ -204,10 +204,18 @@ sequenceDiagram
     end
 
     rect rgb(240, 220, 200)
-        Note over A,FS: FASE 3: Rapporteren
-        A->>C: Generate report prompt
-        C->>A: Markdown rapport
+        Note over A,FS: FASE 3: Rapporteren + Enrichment
+        A->>C: Generate report prompt + candidates JSON
+        loop Voor elke kandidaat
+            C->>A: enrich_candidate tool call
+            Note over A: Expand topics (4-5 specific)
+            Note over A: Extend relevance (3-5 sentences)
+            A->>A: Update candidate in-place
+            A->>C: Tool result (enrichment success)
+        end
+        C->>A: Markdown rapport (using enriched data)
         A->>FS: Save report
+        A->>FS: Save candidates_latest.json (with enriched data)
         A->>FS: Update previous_guests.json
         A->>FS: Save session to search_history.json (all query performance)
         A->>U: Rapport klaar
@@ -352,6 +360,92 @@ sequenceDiagram
    # Disable via .env
    ENABLE_PROMPT_CACHING=false
    ```
+
+### 6.5 Content Enrichment Flow
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant C as Claude API
+    participant Cand as Candidates List
+
+    Note over A,Cand: Report Generation Start
+    A->>A: Load candidates from search phase
+    Note over Cand: Basic data:<br/>topics: ["AI", "regelgeving"]<br/>relevance: "Expert..." (short)
+
+    rect rgb(255, 245, 235)
+        Note over A,C: Multi-turn Enrichment Loop
+        A->>C: PROMPT: Enrich all candidates<br/>TOOLS: [enrich_candidate]
+
+        loop For each candidate (N=8)
+            C->>C: Generate specific topics (4-5)
+            C->>C: Write detailed relevance (3-5 sentences)
+            C->>A: enrich_candidate(name, enriched_topics, enriched_relevance)
+            A->>Cand: Update candidate in-place
+            A->>C: Tool result: "✓ Verrijkt: {name}"
+        end
+
+        C->>A: Final: Generate markdown report
+    end
+
+    Note over Cand: Enriched data:<br/>topics: ["Praktische implementatie EU AI Act", ...]<br/>relevance: "Professor met focus op..." (detailed)
+
+    A->>A: Save candidates_latest.json (enriched)
+    A->>A: Save markdown report
+    Note over A: Same rich content in:<br/>- Report (markdown)<br/>- JSON (data)<br/>- Trello (cards)
+```
+
+**Content Enrichment Strategie:**
+
+1. **Waarom enrichment?**
+   - Search phase levert basic data: generieke topics, korte relevance
+   - Report needs detail: specifieke onderwerpen, uitgebreide context
+   - Trello needs context: rijk content voor decision making
+   - **Oplossing**: Enrich tijdens report generation, save terug naar candidates
+
+2. **Enrichment proces**:
+   ```python
+   # Before (from search phase):
+   {
+     "topics": ["AI", "regelgeving"],
+     "relevance_description": "Expert op gebied van AI wetgeving"
+   }
+
+   # After (from report generation):
+   {
+     "topics": [
+       "Praktische implementatie van de EU AI Act in Nederland",
+       "Privacy- en databeschermingsregels voor AI-systemen",
+       "Juridische risico's van generative AI"
+     ],
+     "relevance_description": "Professor Global ICT Law aan Tilburg University met focus op praktische toepassing van nieuwe AI wetgeving. Haar expertise ligt op het snijvlak van juridische compliance en ethische AI-ontwikkeling. Ze spreekt regelmatig op conferenties over implementatie-uitdagingen."
+   }
+   ```
+
+3. **Tool definition**:
+   ```python
+   {
+     "name": "enrich_candidate",
+     "input_schema": {
+       "name": "string",  # Match exactly
+       "enriched_topics": ["array of 4-5 specific topics"],
+       "enriched_relevance": "3-5 sentence detailed description"
+     }
+   }
+   ```
+
+4. **Flow details**:
+   - Agent gets candidates JSON in prompt
+   - Agent calls `enrich_candidate` for each (8× tool calls)
+   - Agent updates `self.candidates` in-place
+   - Agent generates markdown using enriched data
+   - Enriched data flows: candidates_latest.json → Trello cards
+
+5. **Benefits**:
+   - Single source of truth voor enriched content
+   - Trello cards have same detail as reports
+   - No manual copying/pasting
+   - Consistent data across all outputs
 
 ## 7. Deployment View
 

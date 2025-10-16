@@ -94,6 +94,7 @@ graph TB
 </div>
 
 **Phase 3: Report & Export** 📋
+- **Content enrichment** (new!)
 - Generate markdown report
 - Interactive selection UI
 - One-click Trello export
@@ -641,18 +642,63 @@ graph LR
 
 ---
 
+## ✨ Content Enrichment: Rich Trello Cards
+
+**Problem:** Reports had detailed content, but Trello cards only showed basic data
+
+**Before:**
+```json
+{
+  "topics": ["AI", "regelgeving"],
+  "relevance": "Expert op gebied van AI wetgeving"
+}
+```
+
+**After (via enrich_candidate tool):**
+```json
+{
+  "topics": [
+    "Praktische implementatie van de EU AI Act in Nederland",
+    "Privacy- en databeschermingsregels voor AI-systemen"
+  ],
+  "relevance": "Professor Global ICT Law met focus op praktische toepassing van nieuwe AI wetgeving. Expertise op snijvlak van juridische compliance en ethische AI-ontwikkeling..."
+}
+```
+
+---
+
+## Content Enrichment Flow
+
+```mermaid
+graph LR
+    R[Report Phase] -->|enrich_candidate tool| C[Claude API]
+    C -->|8× tool calls| D[Update Candidates]
+    D -->|enriched data| M[Markdown Report]
+    D -->|save| J[candidates_latest.json]
+    J -->|export| T[Trello Cards]
+
+    style D fill:#c8e6c9
+    style J fill:#fff3e0
+    style T fill:#e3f2fd
+```
+
+**Result:** Same rich content in reports AND Trello cards!
+
+---
+
 ## Key Features Summary
 
 **What Makes It Special:**
 
 - ✅ **AI-powered strategic planning** - Not just keyword search
+- ✅ **Content enrichment** - Rich details for Trello cards
 - ✅ **Prompt caching** - 70-80% cost reduction via Anthropic caching
 - ✅ **Multi-provider fallback** - Never fails due to rate limits
 - ✅ **Automatic name extraction** - Regex-based person detection
 - ✅ **Multi-turn conversations** - Proper tool call sequences
 - ✅ **Smart deduplication** - 12-week guest tracking
 - ✅ **Beautiful terminal UI** - Professional & user-friendly
-- ✅ **One-click Trello export** - Seamless workflow
+- ✅ **One-click Trello export** - Seamless workflow with enriched content
 - ✅ **Comprehensive testing** - 192 tests, all passing
 - ✅ **Cost-effective** - ~$0.01 per search (with caching)
 

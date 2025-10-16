@@ -11,12 +11,13 @@ AI-driven podcast guest finder and topic researcher with intelligent search and 
 🤖 **AI-Powered Search** - Claude Sonnet 4 agent with extended thinking for strategic guest finding
 🎓 **Learning System** - Agent learns from previous searches to improve strategy over time
 💰 **Prompt Caching** - 70-80% cost reduction via Anthropic prompt caching (automatic name extraction + multi-turn conversations)
+✨ **Content Enrichment** - Automatic expansion of candidate details during report generation for richer Trello cards
 🔍 **Topic Research** - Separate tool to find interesting AI topics for your podcast
 🔄 **Multi-Provider Fallback** - Serper → SearXNG → Brave → Google Scraper
 ⚡ **Smart Rate Limiting** - Automatic provider skipping on 402/429 errors
 💾 **Intelligent Caching** - 1-day result cache to minimize API calls
 🎯 **Interactive Selection** - Beautiful terminal UI to review and select guests
-📋 **Trello Integration** - One-click export of guests to Trello boards
+📋 **Trello Integration** - One-click export of guests to Trello boards with enriched content
 📝 **Rich Markdown Reports** - Beautiful terminal-rendered reports with syntax highlighting
 ✅ **Well Tested** - 192 tests covering 11 critical areas (guest finder + topic researcher + learning)
 📊 **Arc42 Documentation** - Complete architecture documentation with Mermaid diagrams
@@ -66,9 +67,10 @@ This will:
 1. **Planning Phase**: AI analyzes current trends and creates search strategy
 2. **Search Phase**: AI agent finds potential guests using web search
 3. **Analysis Phase**: Fetches full page content to identify specific people
-4. **Report Generation**: Creates a markdown report in `output/reports/`
-5. **Report Preview** (optional): View formatted report in terminal with Rich markdown
-6. **Interactive Selection**: Prompts to review and select guests for Trello
+4. **Report Generation**: Creates a markdown report with enriched candidate details
+5. **Content Enrichment**: AI expands topics and relevance descriptions for each candidate
+6. **Report Preview** (optional): View formatted report in terminal with Rich markdown
+7. **Interactive Selection**: Prompts to review and select guests for Trello
 
 **Alternative workflows:**
 
@@ -219,6 +221,33 @@ mypy src/
 ```
 
 ## Features
+
+### Content Enrichment
+During report generation, the AI automatically enriches each candidate with detailed information:
+- 🎯 **Specific Topics**: Expands generic topics like "AI" into 4-5 concrete topics like "Praktische implementatie van de EU AI Act in Nederland"
+- 📝 **Extended Relevance**: Transforms short descriptions into 3-5 sentence detailed explanations of why the person is relevant
+- 🔄 **Automatic Flow**: Enriched data flows from reports → JSON → Trello cards
+- ✨ **Single Source of Truth**: Same rich content appears in reports and Trello
+
+**Before enrichment:**
+```json
+{
+  "topics": ["AI", "regelgeving"],
+  "relevance_description": "Expert op het gebied van AI wetgeving"
+}
+```
+
+**After enrichment:**
+```json
+{
+  "topics": [
+    "Praktische implementatie van de EU AI Act in Nederland",
+    "Privacy- en databeschermingsregels voor AI-systemen",
+    "Juridische risico's van generative AI in organisaties"
+  ],
+  "relevance_description": "Professor Global ICT Law aan Tilburg University met focus op de praktische toepassing van nieuwe AI wetgeving. Haar expertise ligt op het snijvlak van juridische compliance en ethische AI-ontwikkeling..."
+}
+```
 
 ### Learning System
 The agent automatically learns from previous search sessions to improve its strategy:
