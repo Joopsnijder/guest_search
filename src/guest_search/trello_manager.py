@@ -138,7 +138,11 @@ class TrelloManager:
         if "sources" in guest and guest["sources"]:
             description_parts.append("**Bronnen:**")
             for source in guest["sources"]:
-                if isinstance(source, dict):
+                if isinstance(source, str):
+                    # Simple string URL format (new format)
+                    description_parts.append(f"- {source}")
+                elif isinstance(source, dict):
+                    # Object format with url/title/date (legacy format)
                     url = source.get("url", "")
                     title = source.get("title", url)
                     date = source.get("date", "")

@@ -90,6 +90,7 @@ class TestTrelloCardOperations:
         test_card_names = [
             "Test Guest (Pytest)",
             "Complete Test Guest (Pytest)",
+            "String Sources Test (Pytest)",
         ]
 
         # Cleanup before test (in case of previous test failures)
@@ -155,6 +156,28 @@ class TestTrelloCardOperations:
         assert "id" in card_info
         assert "url" in card_info
         assert card_info["name"] == "Complete Test Guest (Pytest)"
+
+    def test_create_guest_card_with_string_sources(self, cleanup_test_cards):
+        """Test creating a card with string sources (new format)."""
+        guest = {
+            "name": "String Sources Test (Pytest)",
+            "organization": "Test University",
+            "role": "Professor AI",
+            "topics": ["AI", "Machine Learning", "Data Science"],
+            "relevance_description": "Leading expert in AI research, speaker at major conferences",
+            "sources": [
+                "https://university.edu/news/ai-research",
+                "https://conference.com/speakers/test"
+            ],
+            "contact_info": {}
+        }
+
+        # Create card
+        card_info = cleanup_test_cards.create_guest_card(guest)
+
+        assert "id" in card_info
+        assert "url" in card_info
+        assert card_info["name"] == "String Sources Test (Pytest)"
 
 
 # Mark all tests as integration tests
