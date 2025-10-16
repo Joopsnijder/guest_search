@@ -751,6 +751,73 @@ Er is nog geen historische data beschikbaar.\n"
             Panel(summary, title="[bold green]Zoeken Voltooid", border_style="green")
         )
 
+    def enrich_linkedin_profiles(self):
+        """Fase 2.5: Zoek LinkedIn profielen voor alle kandidaten"""
+
+        if not self.candidates:
+            return
+
+        self.console.print()
+        self.console.print(
+            Panel.fit(
+                "[bold cyan]🔗 LINKEDIN ENRICHMENT[/bold cyan]\n"
+                "Zoek LinkedIn profielen voor kandidaten",
+                border_style="cyan",
+            )
+        )
+
+        enriched_count = 0
+
+        with self.console.status("[cyan]LinkedIn profielen zoeken...[/cyan]"):
+            for candidate in self.candidates:
+                name = candidate.get("name", "")
+                organization = candidate.get("organization", "")
+
+                if not name or not organization:
+                    continue
+
+                # Search for LinkedIn profile
+                query = f'"{name}" {organization} LinkedIn'
+
+                try:
+                    search_result = self.smart_search.search(query, num_results=5)
+                    results = search_result.get("results", [])
+
+                    # Find first linkedin.com/in/ URL
+                    linkedin_url = None
+                    for result in results:
+                        # Check both 'url' and 'link' keys (different providers)
+                        url = result.get("link", result.get("url", ""))
+                        if "linkedin.com/in/" in url:
+                            linkedin_url = url
+                            break
+
+                    if linkedin_url:
+                        # Ensure contact_info exists
+                        if "contact_info" not in candidate:
+                            candidate["contact_info"] = {}
+
+                        candidate["contact_info"]["linkedin"] = linkedin_url
+                        enriched_count += 1
+
+                        self.console.print(f"[dim]✓ LinkedIn gevonden: {name}[/dim]")
+
+                except Exception as e:
+                    # Silent fail - LinkedIn is nice to have, not critical
+                    if os.getenv("DEBUG_TOOLS"):
+                        self.console.print(f"[dim]⚠️  LinkedIn search failed for {name}: {e}[/dim]")
+                    continue
+
+        # Show summary
+        summary = Table(show_header=False, box=None)
+        summary.add_row(
+            "[green]✓[/green]", "LinkedIn profielen", f"{enriched_count}/{len(self.candidates)}"
+        )
+
+        self.console.print(
+            Panel(summary, title="[bold green]LinkedIn Enrichment Voltooid", border_style="green")
+        )
+
     def generate_report(self):
         """Fase 3: Genereer eindrapport"""
 
@@ -974,9 +1041,10 @@ Er is nog geen historische data beschikbaar.\n"
         # Fase 2: Zoeken
         self.run_search_phase(strategy)
 
+        # Fase 2.5: LinkedIn Enrichment
+        self.enrich_linkedin_profiles()
+
         # Fase 3: Rapporteren
         report = self.generate_report()
 
-        return report
-        return report
         return report

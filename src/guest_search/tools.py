@@ -30,21 +30,6 @@ def get_tools():
             },
         },
         {
-            "name": "search_linkedin_profile",
-            "description": "Zoek een LinkedIn-profiel op basis van naam en bedrijf. Gebruik deze tool om het meest relevante LinkedIn-profiel te vinden voor een kandidaat, door zowel de volledige naam als de organisatie te combineren voor een accurate match.",
-            "input_schema": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string", "description": "Volledige naam van de persoon"},
-                    "company": {
-                        "type": "string",
-                        "description": "Naam van het bedrijf of de organisatie",
-                    },
-                },
-                "required": ["name", "company"],
-            },
-        },
-        {
             "name": "fetch_page_content",
             "description": """Haal de volledige inhoud van een webpagina op en extraheer automatisch
             personen met hun context. Gebruik dit voor:

@@ -233,7 +233,8 @@ SEARCH_EXECUTION_PROMPT_DYNAMIC = """## 📊 Huidige Sessie Status
 
 Voer deze query nu uit volgens de bovenstaande instructies."""
 
-REPORT_GENERATION_PROMPT = """Je taak: Maak een rapport van de gevonden kandidaten voor AIToday Live.
+REPORT_GENERATION_PROMPT = """
+Je taak: Maak een rapport van de gevonden kandidaten voor AIToday Live.
 
 ## Nieuwe kandidaten deze week
 {candidates_json}
