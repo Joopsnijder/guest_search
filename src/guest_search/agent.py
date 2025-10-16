@@ -829,7 +829,7 @@ Er is nog geen historische data beschikbaar.\n"
         status_msg = "[cyan]Agent verrijkt kandidaten en schrijft rapport...[/cyan]"
         with self.console.status(status_msg):
             # Max 10 turns (enough for enriching all candidates + report)
-            for _ in range(10):
+            for turn_num in range(10):
                 response = self.client.messages.create(
                     model=Config.MODEL,
                     max_tokens=Config.SEARCH_MAX_TOKENS,
@@ -837,8 +837,19 @@ Er is nog geen historische data beschikbaar.\n"
                     tools=[enrich_tool],  # type: ignore
                 )
 
-                # Check stop reason
-                if response.stop_reason == "tool_use":
+                # Debug: show what the agent is doing
+                if os.getenv("DEBUG_TOOLS"):
+                    self.console.print(f"[dim]Turn {turn_num + 1}: {response.stop_reason}[/dim]")
+                    for block in response.content:
+                        if block.type == "text":
+                            self.console.print(f"[dim]  Text: {block.text[:100]}...[/dim]")
+                        elif block.type == "tool_use":
+                            self.console.print(f"[dim]  Tool: {block.name}[/dim]")
+
+                # Check if there are tool calls in the response (regardless of stop reason)
+                has_tool_calls = any(block.type == "tool_use" for block in response.content)
+
+                if has_tool_calls:
                     # Process tool calls
                     tool_results = []
                     for block in response.content:
@@ -847,6 +858,11 @@ Er is nog geen historische data beschikbaar.\n"
                                 # Convert tool input to dict
                                 tool_input = dict(block.input) if block.input else {}
                                 result = self._handle_enrich_candidate(tool_input)
+
+                                # Show progress
+                                name = tool_input.get("name", "unknown")  # type: ignore
+                                self.console.print(f"[dim]✓ Verrijkt: {name}[/dim]")
+
                                 tool_results.append(
                                     {
                                         "type": "tool_result",

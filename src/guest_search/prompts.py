@@ -233,11 +233,7 @@ SEARCH_EXECUTION_PROMPT_DYNAMIC = """## 📊 Huidige Sessie Status
 
 Voer deze query nu uit volgens de bovenstaande instructies."""
 
-REPORT_GENERATION_PROMPT = """Maak een rapport van de gevonden kandidaten voor AIToday Live.
-
-BELANGRIJK: Voor elke nieuwe kandidaat moet je EERST de enrich_candidate tool aanroepen om de
-verrijkte informatie (uitgebreide topics en relevance) op te slaan. Pas DAARNA genereer je het
-volledige markdown rapport.
+REPORT_GENERATION_PROMPT = """Je taak: Maak een rapport van de gevonden kandidaten voor AIToday Live.
 
 ## Nieuwe kandidaten deze week
 {candidates_json}
@@ -247,20 +243,20 @@ volledige markdown rapport.
 
 Indicatoren:
 
-## Werkwijze:
+## STAP 1: Verrijk ELKE kandidaat
 
-1. Voor elke kandidaat in de nieuwe kandidaten lijst:
-   - Bedenk 4-5 specifieke, concrete onderwerpen
-     (niet algemeen zoals "AI" maar specifiek zoals
-     "Cijfers over AI-impact op banen in Nederland")
-   - Schrijf een uitgebreide relevance_description van 3-5 zinnen die feitelijk beschrijft:
-     * Wat deze persoon doet/heeft gedaan
-     * Waarom relevant voor AIToday Live
-     * Recente ontwikkelingen of projecten
-     * Geen hype, wel informatief
-   - Roep de enrich_candidate tool aan met deze verrijkte data
+Voor elke kandidaat in de lijst hierboven moet je de `enrich_candidate` tool aanroepen.
 
-2. Nadat je ALLE kandidaten hebt verrijkt via de tool, genereer je het volledige markdown rapport
+Voor elke kandidaat:
+- Bedenk 4-5 SPECIFIEKE onderwerpen (NIET "AI", WEL "Cijfers over AI-impact op banen in Nederland")
+- Schrijf 3-5 zinnen relevance die feitelijk beschrijft wat deze persoon doet en waarom relevant
+- Roep dan enrich_candidate aan met: name, enriched_topics, enriched_relevance
+
+Begin nu met het aanroepen van enrich_candidate voor de eerste kandidaat.
+
+## STAP 2: Genereer rapport (PAS NA alle tool calls)
+
+Na het verrijken van alle kandidaten, genereer het volledige markdown rapport
 
 ## Rapport specificaties
 
