@@ -52,14 +52,14 @@ cp .env.example .env
 ```
 
 Required:
-- `ANTHROPIC_API_KEY` - Get from https://console.anthropic.com/
+* `ANTHROPIC_API_KEY` - Get from https://console.anthropic.com/
 
 Recommended (at least one search provider):
-- `SERPER_API_KEY` - Get from https://serper.dev (2,500 free searches/month)
-- `BRAVE_API_KEY` - Get from https://brave.com/search/api/
+* `SERPER_API_KEY` - Get from https://serper.dev (2, 500 free searches/month)
+* `BRAVE_API_KEY` - Get from https://brave.com/search/api/
 
 Optional (for Trello integration):
-- `TRELLO_API_KEY` and `TRELLO_TOKEN` - See [TRELLO_SETUP.md](TRELLO_SETUP.md)
+* `TRELLO_API_KEY` and `TRELLO_TOKEN` - See [docs/TRELLO_SETUP.md](TRELLO_SETUP.md)
 
 ### 3. Run the Tools
 
@@ -104,50 +104,51 @@ This will:
 4. **Report Preview**: Beautiful Rich markdown rendering in terminal with emojis per category
 
 **Features:**
-- 📅 Automatic duplicate detection (won't search twice on same day)
-- 🎯 Targeted for "Anne de Vries" persona (IT product owner, early adopter)
-- 🏷️ 6 categories: Wetenschappelijk, Praktijkvoorbeeld, Informatief, Transformatie, Waarschuwend, Kans
-- 📊 Each topic includes: ideal guest profile, search keywords, discussion angles
-- 💾 Saves both markdown report and JSON data for easy processing
+* 📅 Automatic duplicate detection (won't search twice on same day)
+* 🎯 Targeted for "Anne de Vries" persona (IT product owner, early adopter)
+* 🏷️ 6 categories: Wetenschappelijk, Praktijkvoorbeeld, Informatief, Transformatie, Waarschuwend, Kans
+* 📊 Each topic includes: ideal guest profile, search keywords, discussion angles
+* 💾 Saves both markdown report and JSON data for easy processing
 
 ### 4. Interactive Guest Selection
 
 The interactive selector provides a beautiful terminal UI where you can:
 
 ✨ **Features:**
-- 🎨 Browse all new and recent guests with full details
-- 🔗 View all source URLs for easy reference and verification
-- 📧 See contact information when available (email, LinkedIn)
-- 📋 Export selected guests to Trello with one click
-- ✓ Automatic duplicate detection before creating cards
-- 📊 See guests from the last 2 weeks (yellow-highlighted)
+* 🎨 Browse all new and recent guests with full details
+* 🔗 View all source URLs for easy reference and verification
+* 📧 See contact information when available (email, LinkedIn)
+* 📋 Export selected guests to Trello with one click
+* ✓ Automatic duplicate detection before creating cards
+* 📊 See guests from the last 2 weeks (yellow-highlighted)
 
 **Available actions:**
-- Type a number (e.g., `1`) to select that guest for Trello export
-- Type `all` to export all new guests at once
-- Type `quit` or `q` to exit
+* Type a number (e.g.,  `1`) to select that guest for Trello export
+* Type `all` to export all new guests at once
+* Type `quit` or `q` to exit
 
 **Each guest card shows:**
-- Name, role, and organization
-- Topics of expertise
-- Why they're relevant right now
-- All source URLs (clickable in most terminals)
-- Contact info if available
-- Date recommended (for recent guests)
+* Name, role, and organization
+* Topics of expertise
+* Why they're relevant right now
+* All source URLs (clickable in most terminals)
+* Contact info if available
+* Date recommended (for recent guests)
 
 ### 5. Markdown Report Viewing
 
 Both tools generate beautiful markdown reports that can be viewed directly in the terminal:
 
 **Features:**
-- 📝 Rich markdown rendering with proper formatting
-- 🎨 Syntax highlighting for code blocks
-- 📋 Beautiful headers with borders
-- 📊 Clean bullet lists and numbered lists
-- 🔗 Visible URLs for easy reference
-- ➖ Horizontal rules as section dividers
+* 📝 Rich markdown rendering with proper formatting
+* 🎨 Syntax highlighting for code blocks
+* 📋 Beautiful headers with borders
+* 📊 Clean bullet lists and numbered lists
+* 🔗 Visible URLs for easy reference
+* ➖ Horizontal rules as section dividers
 
 **Example output:**
+
 ```
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃    Potentiële gasten voor AIToday Live - Week 41   ┃
@@ -180,11 +181,13 @@ pip install -e ".[dev]"
 **📊 Test Suite: 181 tests covering 10 critical areas**
 
 #### In VSCode (Recommended)
+
 1. Open Test Explorer (🧪 icon in sidebar)
 2. Click ▶️ to run tests or 🐛 to debug
 3. See [VSCODE_TEST_GUIDE.md](docs/VSCODE_TEST_GUIDE.md) for full guide
 
 #### In Terminal
+
 ```bash
 # Run all unit tests (skip integration tests)
 pytest -m "not integration" -v
@@ -206,11 +209,12 @@ pytest -m integration -v
 ```
 
 #### Test Documentation
-- 📖 [VSCode Testing Guide](docs/VSCODE_TEST_GUIDE.md) - Full VSCode integration guide
-- 📊 [Test Coverage Summary](docs/TEST_COVERAGE_SUMMARY.md) - Detailed risk analysis
-- ⚡ [Quick Reference](docs/QUICK_TEST_REFERENCE.md) - Common commands
-- 📝 [Test Suite README](tests/README.md) - Writing new tests
-- 🔗 [Integration Tests](tests/INTEGRATION_TESTS.md) - Trello integration testing
+
+* 📖 [VSCode Testing Guide](docs/VSCODE_TEST_GUIDE.md) - Full VSCode integration guide
+* 📊 [Test Coverage Summary](docs/TEST_COVERAGE_SUMMARY.md) - Detailed risk analysis
+* ⚡ [Quick Reference](docs/QUICK_TEST_REFERENCE.md) - Common commands
+* 📝 [Test Suite README](tests/README.md) - Writing new tests
+* 🔗 [Integration Tests](tests/INTEGRATION_TESTS.md) - Trello integration testing
 
 ### Code Quality
 
@@ -231,13 +235,15 @@ mypy src/
 ## Features
 
 ### Content Enrichment
+
 During report generation, the AI automatically enriches each candidate with detailed information:
-- 🎯 **Specific Topics**: Expands generic topics like "AI" into 4-5 concrete topics like "Praktische implementatie van de EU AI Act in Nederland"
-- 📝 **Extended Relevance**: Transforms short descriptions into 3-5 sentence detailed explanations of why the person is relevant
-- 🔄 **Automatic Flow**: Enriched data flows from reports → JSON → Trello cards
-- ✨ **Single Source of Truth**: Same rich content appears in reports and Trello
+* 🎯 **Specific Topics**: Expands generic topics like "AI" into 4-5 concrete topics like "Praktische implementatie van de EU AI Act in Nederland"
+* 📝 **Extended Relevance**: Transforms short descriptions into 3-5 sentence detailed explanations of why the person is relevant
+* 🔄 **Automatic Flow**: Enriched data flows from reports → JSON → Trello cards
+* ✨ **Single Source of Truth**: Same rich content appears in reports and Trello
 
 **Before enrichment:**
+
 ```json
 {
   "topics": ["AI", "regelgeving"],
@@ -246,6 +252,7 @@ During report generation, the AI automatically enriches each candidate with deta
 ```
 
 **After enrichment:**
+
 ```json
 {
   "topics": [
@@ -258,14 +265,16 @@ During report generation, the AI automatically enriches each candidate with deta
 ```
 
 ### LinkedIn Enrichment
+
 After finding candidates, the system automatically searches for LinkedIn profiles:
-- 🔍 **Automatic Search**: For each candidate, searches `"{name} {organization} LinkedIn"`
-- 🎯 **Profile Extraction**: Finds first `linkedin.com/in/` URL in results
-- 📋 **Trello Integration**: LinkedIn links appear at top of Trello cards
-- ⚡ **Fast & Reliable**: Uses existing SmartSearch infrastructure
-- 🔄 **Graceful Degradation**: Silently skips if profile not found
+* 🔍 **Automatic Search**: For each candidate, searches `"{name} {organization} LinkedIn"`
+* 🎯 **Profile Extraction**: Finds first `linkedin.com/in/` URL in results
+* 📋 **Trello Integration**: LinkedIn links appear at top of Trello cards
+* ⚡ **Fast & Reliable**: Uses existing SmartSearch infrastructure
+* 🔄 **Graceful Degradation**: Silently skips if profile not found
 
 **Example output:**
+
 ```
 ╭─────────────────────────────────────────╮
 │ 🔗 LINKEDIN ENRICHMENT                  │
@@ -279,6 +288,7 @@ After finding candidates, the system automatically searches for LinkedIn profile
 ```
 
 **Trello card layout:**
+
 ```
 CEO bij Deeploy
 
@@ -295,24 +305,26 @@ Mogelijke onderwerpen:
 This makes it easy for the production team to contact guests with one click!
 
 ### Learning System
+
 The agent automatically learns from previous search sessions to improve its strategy:
-- 📈 Tracks query performance (which searches find the most candidates)
-- 🎯 Identifies most productive sources and websites
-- 🧠 Uses historical data to make better search strategies
-- 📊 Analyzes last 4 weeks of search history
-- 🔄 Improves over time without manual intervention
+* 📈 Tracks query performance (which searches find the most candidates)
+* 🎯 Identifies most productive sources and websites
+* 🧠 Uses historical data to make better search strategies
+* 📊 Analyzes last 4 weeks of search history
+* 🔄 Improves over time without manual intervention
 
 The agent shows learning insights during the planning phase, helping it focus on proven successful approaches.
 
 See [LEARNING_SYSTEM.md](docs/LEARNING_SYSTEM.md) for detailed documentation.
 
 ### Smart Search with Rate Limit Handling
+
 The search tool automatically detects and skips rate-limited providers for the duration of the session:
-- 🔄 Multi-provider fallback (Serper → SearXNG → Brave → Google Scraper)
-- ⚡ Automatic provider skipping on rate limits (402/429 errors)
-- 💾 1-day caching to reduce API calls
-- 📊 Session tracking of rate-limited providers
-- ✨ Serper primary for best quality snippets
+* 🔄 Multi-provider fallback (Serper → SearXNG → Brave → Google Scraper)
+* ⚡ Automatic provider skipping on rate limits (402/429 errors)
+* 💾 1-day caching to reduce API calls
+* 📊 Session tracking of rate-limited providers
+* ✨ Serper primary for best quality snippets
 
 See [RATE_LIMIT_HANDLING.md](docs/RATE_LIMIT_HANDLING.md) for details.
 

@@ -4,11 +4,11 @@ Complete guide to using the Guest Search and Topic Researcher tools.
 
 ## Table of Contents
 
-- [Guest Finder](#guest-finder)
-- [Topic Researcher](#topic-researcher)
-- [Markdown Report Viewing](#markdown-report-viewing)
-- [Interactive Guest Selection](#interactive-guest-selection)
-- [Trello Integration](#trello-integration)
+* [Guest Finder](#guest-finder)
+* [Topic Researcher](#topic-researcher)
+* [Markdown Report Viewing](#markdown-report-viewing)
+* [Interactive Guest Selection](#interactive-guest-selection)
+* [Trello Integration](#trello-integration)
 
 ---
 
@@ -41,6 +41,7 @@ python guest_search.py
    - Generates markdown report with all candidates
    - Includes recent guests from last 2 weeks
    - Saves to `output/reports/week_X_YYYYMMDD.md`
+
    - Updates `data/previous_guests.json` for deduplication
 
 4. **Report Preview** (Optional)
@@ -63,7 +64,7 @@ data/candidates_latest.json            # Latest candidates for UI
 
 ### Configuration
 
-Edit `src/guest_search/config.py`:
+Edit `src/guest_search/config.py` :
 
 ```python
 TARGET_CANDIDATES = 5        # Number of guests to find
@@ -92,7 +93,9 @@ python topic_search.py
    - Prevents duplicate API calls on same day
 
 2. **Existing Report Flow**
-   ```
+   
+
+```
    ⚠️  Er bestaat al een rapport voor vandaag
    Aangemaakt: 12 October 2025
 
@@ -121,20 +124,20 @@ python topic_search.py
 
 ### Topic Categories
 
-- 🔬 **Wetenschappelijk** - Research breakthrough with practical implications
-- 💼 **Praktijkvoorbeeld** - Dutch organization successfully using AI
-- 📚 **Informatief** - Explanation of AI concept/tech that's now relevant
-- 🔄 **Transformatie** - Sector/industry being transformed by AI
-- ⚠️ **Waarschuwend** - Risk, failure, or ethical dilemma
-- 🚀 **Kans** - New opportunity or tool to try immediately
+* 🔬 **Wetenschappelijk** - Research breakthrough with practical implications
+* 💼 **Praktijkvoorbeeld** - Dutch organization successfully using AI
+* 📚 **Informatief** - Explanation of AI concept/tech that's now relevant
+* 🔄 **Transformatie** - Sector/industry being transformed by AI
+* ⚠️ **Waarschuwend** - Risk, failure, or ethical dilemma
+* 🚀 **Kans** - New opportunity or tool to try immediately
 
 ### Target Persona: Anne de Vries
 
-- **Role**: IT product owner at mid-size Dutch company
-- **Experience**: Knows basic AI concepts, not deeply technical
-- **Interest**: Practical AI application in work and personal life
-- **Attitude**: Enthusiastic but critical - wants to know what works AND what doesn't
-- **Need**: Concrete examples, practical tips, relatable stories
+* **Role**: IT product owner at mid-size Dutch company
+* **Experience**: Knows basic AI concepts, not deeply technical
+* **Interest**: Practical AI application in work and personal life
+* **Attitude**: Enthusiastic but critical - wants to know what works AND what doesn't
+* **Need**: Concrete examples, practical tips, relatable stories
 
 ### Output Files
 
@@ -147,22 +150,22 @@ output/topic_reports/week_41_20251012.json    # JSON data (for processing)
 
 Each topic includes:
 
-- **Title** - Catchy title (max 60 chars)
-- **Category** - One of the 6 categories above
-- **Why relevant for Anne** - 2-3 sentences explaining value
-- **Description** - Short description (2-3 sentences)
-- **Search keywords** - 3-5 keywords to find guests (use with guest_search tool)
-- **Discussion angles** - 3-4 questions/perspectives for podcast
-- **Sources** - Minimum 2 recent sources (preferably Dutch)
+* **Title** - Catchy title (max 60 chars)
+* **Category** - One of the 6 categories above
+* **Why relevant for Anne** - 2-3 sentences explaining value
+* **Description** - Short description (2-3 sentences)
+* **Search keywords** - 3-5 keywords to find guests (use with guest_search tool)
+* **Discussion angles** - 3-4 questions/perspectives for podcast
+* **Sources** - Minimum 2 recent sources (preferably Dutch)
 
 ### Duplicate Detection
 
 The tool automatically prevents duplicate searches:
 
-- Checks for existing report based on **week number + date**
-- If report exists, shows it instead of searching again
-- Option to force new search (overwrites existing)
-- Saves API costs and prevents duplicate work
+* Checks for existing report based on **week number + date**
+* If report exists, shows it instead of searching again
+* Option to force new search (overwrites existing)
+* Saves API costs and prevents duplicate work
 
 ---
 
@@ -172,21 +175,21 @@ Both tools support beautiful terminal rendering of markdown reports.
 
 ### Features
 
-- **Rich Formatting**: Headers, bold, italic, lists
-- **Syntax Highlighting**: Code blocks with themes
-- **Beautiful Headers**: H1 with bordered boxes, H2/H3 with underlining
-- **Clean Lists**: Bullet points (•) and numbered lists
-- **Visible URLs**: Links shown for easy copying
-- **Section Dividers**: Horizontal rules (---) as visual separators
+* **Rich Formatting**: Headers, bold, italic, lists
+* **Syntax Highlighting**: Code blocks with themes
+* **Beautiful Headers**: H1 with bordered boxes, H2/H3 with underlining
+* **Clean Lists**: Bullet points (•) and numbered lists
+* **Visible URLs**: Links shown for easy copying
+* **Section Dividers**: Horizontal rules (---) as visual separators
 
 ### How It Works
 
 When prompted "Wil je het rapport nu in de terminal bekijken?":
 
-- Loads the markdown file
-- Creates Rich `Markdown` object
-- Renders with proper formatting, word wrapping, and colors
-- Shows full report in terminal without opening editor
+* Loads the markdown file
+* Creates Rich `Markdown` object
+* Renders with proper formatting, word wrapping, and colors
+* Shows full report in terminal without opening editor
 
 ### Example Output
 
@@ -248,17 +251,17 @@ python demo_ui.py
 ### UI Features
 
 **Display:**
-- 📋 Compact panels for each guest
-- 🎨 Color-coded: Green for new, Yellow for recent (last 2 weeks)
-- 🔗 Full source URLs displayed
-- 📧 Contact info when available (email, LinkedIn)
-- 📅 Date recommended for recent guests
+* 📋 Compact panels for each guest
+* 🎨 Color-coded: Green for new, Yellow for recent (last 2 weeks)
+* 🔗 Full source URLs displayed
+* 📧 Contact info when available (email, LinkedIn)
+* 📅 Date recommended for recent guests
 
 **Navigation:**
-- Type a number (e.g., `1`, `2`, `3`) to select that guest
-- Type `all` to export all new guests at once
-- Type `quit` or `q` to exit
-- Invalid input shows helpful error message
+* Type a number (e.g.,  `1`,  `2`,  `3`) to select that guest
+* Type `all` to export all new guests at once
+* Type `quit` or `q` to exit
+* Invalid input shows helpful error message
 
 **Each Guest Panel Shows:**
 
@@ -299,13 +302,15 @@ Export selected guests directly to your Trello board.
 
 ### Setup
 
-See [TRELLO_SETUP.md](../TRELLO_SETUP.md) for detailed setup instructions.
+See [TRELLO_SETUP.md](docs/TRELLO_SETUP.md) for detailed setup instructions.
 
 Quick setup:
 1. Get API key: https://trello.com/app-key
 2. Generate token: Click link on API key page
 3. Add to `.env`:
-   ```
+   
+
+```
    TRELLO_API_KEY=your_key_here
    TRELLO_TOKEN=your_token_here
    ```
@@ -323,6 +328,7 @@ When selecting a guest in the interactive UI:
 ### Card Format
 
 **Title:**
+
 ```
 [Naam] - [Organisatie]
 ```
@@ -333,18 +339,22 @@ When selecting a guest in the interactive UI:
 **[Rol] bij [Organisatie]**
 
 ## Waarom interessant
+
 [Context and relevance]
 
 ## Expertise
+
 - Topic 1
 - Topic 2
 - Topic 3
 
 ## Contact
+
 📧 [email]
 🔗 [LinkedIn]
 
 ## Bronnen
+
 • [Source 1]
   [URL 1]
 • [Source 2]
@@ -352,27 +362,30 @@ When selecting a guest in the interactive UI:
 ```
 
 **Key features:**
-- ✅ Role/function at top for quick scanning
-- ✅ Why interesting comes before details
-- ✅ Sources at bottom as reference material
-- ✅ Duplicate detection prevents multiple cards
-- ✅ Clean markdown formatting
+* ✅ Role/function at top for quick scanning
+* ✅ Why interesting comes before details
+* ✅ Sources at bottom as reference material
+* ✅ Duplicate detection prevents multiple cards
+* ✅ Clean markdown formatting
 
 ### Error Handling
 
 **Duplicate Card:**
+
 ```
 ❌ Card for 'Dr. Sarah Veldman - TNO' already exists in the Spot list.
    Please delete the existing card first or use a different name.
 ```
 
 **Missing Configuration:**
+
 ```
 ⚠️  Trello niet geconfigureerd
    Voeg TRELLO_API_KEY en TRELLO_TOKEN toe aan .env
 ```
 
 **Network Issues:**
+
 ```
 ❌ Kon geen verbinding maken met Trello: [error details]
 ```
@@ -383,31 +396,31 @@ When selecting a guest in the interactive UI:
 
 ### Guest Finder
 
-- **Run weekly**: Get fresh candidates every week
-- **Review recent guests**: Check yellow-highlighted recent guests before running new search
-- **Verify sources**: Click URLs in UI to verify candidate relevance
-- **Update previous_guests.json**: Keeps deduplication accurate
+* **Run weekly**: Get fresh candidates every week
+* **Review recent guests**: Check yellow-highlighted recent guests before running new search
+* **Verify sources**: Click URLs in UI to verify candidate relevance
+* **Update previous_guests.json**: Keeps deduplication accurate
 
 ### Topic Researcher
 
-- **Run once per day**: Duplicate detection prevents wasted API calls
-- **Review existing report first**: Before forcing new search
-- **Use JSON output**: Process topic data programmatically if needed
-- **Combine with guest finder**: Use topic keywords to find relevant guests
+* **Run once per day**: Duplicate detection prevents wasted API calls
+* **Review existing report first**: Before forcing new search
+* **Use JSON output**: Process topic data programmatically if needed
+* **Combine with guest finder**: Use topic keywords to find relevant guests
 
 ### Markdown Reports
 
-- **View in terminal**: Faster than opening editor
-- **Copy URLs easily**: All sources visible for quick access
-- **Share via file**: Reports are standalone markdown files
-- **Version control friendly**: Plain text, easy to track changes
+* **View in terminal**: Faster than opening editor
+* **Copy URLs easily**: All sources visible for quick access
+* **Share via file**: Reports are standalone markdown files
+* **Version control friendly**: Plain text, easy to track changes
 
 ### Trello Integration
 
-- **Check for duplicates**: UI warns before creating
-- **Update cards manually**: Edit in Trello after creation
-- **Use Spot list**: Keeps new candidates separate
-- **Move to other lists**: Workflow: Spot → Contacted → Scheduled → Done
+* **Check for duplicates**: UI warns before creating
+* **Update cards manually**: Edit in Trello after creation
+* **Use Spot list**: Keeps new candidates separate
+* **Move to other lists**: Workflow: Spot → Contacted → Scheduled → Done
 
 ---
 
@@ -421,9 +434,12 @@ When selecting a guest in the interactive UI:
 1. Check API keys in `.env`
 2. Verify API quota not exceeded
 3. Check provider status:
-   ```bash
+   
+
+```bash
    python -c "from src.utils.smart_search_tool import SmartSearchTool; t = SmartSearchTool(); print(t.search('test'))"
    ```
+
 4. Check logs for rate limit errors
 
 ### Empty Reports
@@ -445,7 +461,7 @@ When selecting a guest in the interactive UI:
 2. Check token hasn't expired (generate new one)
 3. Verify board name: "AIToday Live"
 4. Verify list name: "Spot"
-5. See [TRELLO_SETUP.md](../TRELLO_SETUP.md)
+5. See [docs/TRELLO_SETUP.md](docs/TRELLO_SETUP.md)
 
 ### Markdown Not Rendering
 
@@ -464,17 +480,18 @@ When selecting a guest in the interactive UI:
 
 Edit `src/guest_search/prompts.py` to customize:
 
-- `PLANNING_PROMPT` - Strategy creation
-- `SEARCH_EXECUTION_PROMPT` - Search instructions
-- `REPORT_GENERATION_PROMPT` - Report formatting
-- `TOPIC_SEARCH_PROMPT` - Topic search criteria
-- `TOPIC_REPORT_GENERATION_PROMPT` - Topic report format
+* `PLANNING_PROMPT` - Strategy creation
+* `SEARCH_EXECUTION_PROMPT` - Search instructions
+* `REPORT_GENERATION_PROMPT` - Report formatting
+* `TOPIC_SEARCH_PROMPT` - Topic search criteria
+* `TOPIC_REPORT_GENERATION_PROMPT` - Topic report format
 
 ### Custom Target Persona
 
 Edit `TOPIC_SEARCH_PROMPT` in prompts.py:
 
 ```python
+
 ## De ideale luisteraar: [Your Persona]
 
 [Your persona description]:
@@ -508,6 +525,6 @@ for topic in topics:
 ---
 
 For more information, see:
-- [README.md](../README.md) - Main documentation
-- [TRELLO_SETUP.md](../TRELLO_SETUP.md) - Trello configuration
-- [RATE_LIMIT_HANDLING.md](RATE_LIMIT_HANDLING.md) - Search provider details
+* [README.md](../README.md) - Main documentation
+* [TRELLO_SETUP.md](../TRELLO_SETUP.md) - Trello configuration
+* [RATE_LIMIT_HANDLING.md](RATE_LIMIT_HANDLING.md) - Search provider details
